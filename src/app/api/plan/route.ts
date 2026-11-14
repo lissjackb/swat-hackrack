@@ -58,7 +58,12 @@ export async function POST(request: Request) {
 
   const today = localYmd();
   const [rows, whoopRow, logs] = await Promise.all([
-    db.menuItem.findMany({ where: { date: { in: DEMO_DATES } } }),
+    // Same ordering as /api/menu: rank() breaks exact-score ties by item
+    // order, so server plans must see items in the same order as the client.
+    db.menuItem.findMany({
+      where: { date: { in: DEMO_DATES } },
+      orderBy: [{ meal: "asc" }, { station: "asc" }, { name: "asc" }],
+    }),
     // Today's snapshot, falling back like /api/whoop's mock path.
     (async () => {
       let row = await db.whoopDay.findFirst({ where: { profileId, date: today } });

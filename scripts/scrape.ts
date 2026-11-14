@@ -129,6 +129,12 @@ function ymd(daysFromToday = 0): string {
 
 /** Hit the live GraphQL feed. Returns null to signal "fall back to snapshot". */
 async function fetchLive(): Promise<{ date: string; items: ParsedItem[] }[] | null> {
+  // SCRAPE_SOURCE=snapshot forces the fallback path (demo-check step 2
+  // verifies the safety net without cutting the network).
+  if (process.env.SCRAPE_SOURCE === "snapshot") {
+    console.warn("SCRAPE_SOURCE=snapshot — skipping live fetch.");
+    return null;
+  }
   try {
     const res = await fetch(GRAPHQL_URL, {
       method: "POST",

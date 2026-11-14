@@ -51,7 +51,10 @@ const PROFILES: { label: string; profile: ProfileInput }[] = [
 let anyFail = false;
 
 async function main() {
-  const rows = await db.menuItem.findMany({ where: { date: { in: DEMO_DATES } } });
+  const rows = await db.menuItem.findMany({
+    where: { date: { in: DEMO_DATES } },
+    orderBy: [{ meal: "asc" }, { station: "asc" }, { name: "asc" }], // same order as /api/menu (rank tie-breaks)
+  });
   console.log(`Planner test — DB rows: ${rows.length} (${DEMO_DATES.join(", ")})\n`);
 
   for (const { label, profile } of PROFILES) {

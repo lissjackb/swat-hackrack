@@ -71,7 +71,12 @@ const CONTEXTS: Record<string, Ctx> = {
 const DEMO_DATES = [...new Set(Object.values(API_MAP).map((q) => q.date))];
 
 async function loadRows(): Promise<MenuItemRowLike[]> {
-  return db.menuItem.findMany({ where: { date: { in: DEMO_DATES } } });
+  // Same ordering as /api/menu — rank() breaks exact-score ties by item
+  // order, so parity with the mockup needs identical item order.
+  return db.menuItem.findMany({
+    where: { date: { in: DEMO_DATES } },
+    orderBy: [{ meal: "asc" }, { station: "asc" }, { name: "asc" }],
+  });
 }
 
 // ---- helpers ----------------------------------------------------------------
@@ -174,10 +179,17 @@ async function main() {
     console.log(`Context ${name}:`);
 
     if (name === "D") {
-      // Breakfast fully eaten: A's own planned breakfast part names.
-      const base = createPlanner(rows, deepFreeze(normalizeContext({ ...CONTEXTS.A, p: { ...A_PROFILE } })));
-      const bk = base.plan("sat").find((x) => x.m.id === "sat-b");
-      ctxIn.ate = { "sat-b": (bk?.parts ?? []).map((pp) => pp.it.name) };
+      // Breakfast fully eaten. When the mockup fixture exists, replay ITS
+      // exact eaten list (so both engines rebalance from identical state);
+      // otherwise use A's own planned breakfast part names.
+      const fxD = loadFixture("D") as (Fixture & { ate?: Record<string, string[]> }) | null;
+      if (fxD?.ate) {
+        ctxIn.ate = fxD.ate;
+      } else {
+        const base = createPlanner(rows, deepFreeze(normalizeContext({ ...CONTEXTS.A, p: { ...A_PROFILE } })));
+        const bk = base.plan("sat").find((x) => x.m.id === "sat-b");
+        ctxIn.ate = { "sat-b": (bk?.parts ?? []).map((pp) => pp.it.name) };
+      }
     }
 
     // Freeze ctx (deep) so any planner mutation throws (PLANNER_SPEC).

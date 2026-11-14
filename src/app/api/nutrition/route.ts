@@ -18,6 +18,7 @@
 import { db } from "@/lib/db";
 import { lookupNutrition } from "@/lib/usda";
 import { menuItemToDTO } from "@/lib/menu";
+import { THEMES } from "@/lib/planner/data";
 import type { MenuItemDTO } from "@/lib/types";
 
 export async function GET(request: Request) {
@@ -51,6 +52,14 @@ export async function GET(request: Request) {
   // Sequential on purpose: USDA rate-limits per hour, and the in-process cache
   // in usda.ts means repeated item names across the week cost only one call.
   for (const r of rows) {
+    // Station theme headers ("Chefs Choice", "Steak Night", …) are not food.
+    // A USDA "match" for one gives a non-food row real macros, and the
+    // planner would then recommend "2 servings of Chefs Choice". Leave them
+    // at 0 so the planner skips them (same as the mockup's bootstrap).
+    if (THEMES.has(r.name)) {
+      items.push(menuItemToDTO({ ...r, calories: 0, protein: 0, carbs: 0, fat: 0 }));
+      continue;
+    }
     const nutrition = await lookupNutrition(r.name);
     const macros = nutrition
       ? {
