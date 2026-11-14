@@ -4,7 +4,8 @@
 import { db } from "@/lib/db";
 import { recommendPlate } from "@/lib/recommend";
 import { explainPlate } from "@/lib/claude";
-import type { MacroTargets, Meal, MenuItemDTO } from "@/lib/types";
+import { menuItemToDTO } from "@/lib/menu";
+import type { MacroTargets, Meal } from "@/lib/types";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
@@ -17,20 +18,7 @@ export async function POST(request: Request) {
   const rows = await db.menuItem.findMany({
     where: { date: body.date, meal: body.meal },
   });
-  const items: MenuItemDTO[] = rows.map((r) => ({
-    id: r.id,
-    date: r.date,
-    meal: r.meal as Meal,
-    station: r.station,
-    name: r.name,
-    servingSize: r.servingSize,
-    calories: r.calories,
-    protein: r.protein,
-    carbs: r.carbs,
-    fat: r.fat,
-    dietary: JSON.parse(r.dietary) as string[],
-    allergens: JSON.parse(r.allergens) as string[],
-  }));
+  const items = rows.map(menuItemToDTO);
 
   const plate = recommendPlate(items, body.target, body.restrictions ?? []);
   plate.note = await explainPlate(plate);

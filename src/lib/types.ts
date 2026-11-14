@@ -32,6 +32,9 @@ export interface MacroTargets {
   fat: number;
 }
 
+/** The four macro keys, in order. Single source for iterating MacroTargets. */
+export const MACROS = ["calories", "protein", "carbs", "fat"] as const;
+
 export interface Targets {
   daily: MacroTargets;
   perMeal: Record<Meal, MacroTargets>;

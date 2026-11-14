@@ -17,7 +17,7 @@
 //   2. Brute-force the best INTEGER plate (0..2 servings each, ≤4 distinct
 //      items) over just that small active set. Exact and ~instant.
 import solver from "javascript-lp-solver";
-import type { MacroTargets, MenuItemDTO, Plate, PlateItem } from "./types";
+import { MACROS, type MacroTargets, type MenuItemDTO, type Plate, type PlateItem } from "./types";
 
 const MAX_SERVINGS_PER_ITEM = 2; // realistic portion cap (skill: ≤2 each)
 const MAX_DISTINCT_ITEMS = 4; // keep plates simple (skill: ≤4 items)
@@ -25,7 +25,6 @@ const ACTIVE_SET = 10; // items carried into the integer brute force
 
 // Relative importance per macro. Calories + protein are the demo's pass
 // criteria (within 10%); carbs + fat matter but shouldn't dominate.
-const MACROS = ["calories", "protein", "carbs", "fat"] as const;
 const MACRO_IMPORTANCE = { calories: 1, protein: 1.2, carbs: 0.3, fat: 0.3 };
 
 // Dietary restriction -> required label present on the item.
@@ -60,15 +59,12 @@ export function filterByRestrictions(
   });
 }
 
-/** Weighted relative deviation of a plate's totals from the targets. */
-function deviation(
-  plate: { item: MenuItemDTO; servings: number }[],
-  target: MacroTargets,
-): number {
-  return MACROS.reduce((acc, m) => {
-    const actual = plate.reduce((s, p) => s + p.item[m] * p.servings, 0);
-    return acc + (MACRO_IMPORTANCE[m] * Math.abs(actual - target[m])) / (target[m] || 1);
-  }, 0);
+/** Weighted relative deviation of macro totals from the targets. */
+function deviationOf(totals: MacroTargets, target: MacroTargets): number {
+  return MACROS.reduce(
+    (acc, m) => acc + (MACRO_IMPORTANCE[m] * Math.abs(totals[m] - target[m])) / (target[m] || 1),
+    0,
+  );
 }
 
 /**
@@ -122,29 +118,44 @@ function bestIntegerPlate(
   const n = active.length;
   const combo = new Array<number>(n).fill(0);
   let bestCombo: number[] | null = null;
-  let bestDev = deviation([], target);
+  let bestDev = deviationOf({ calories: 0, protein: 0, carbs: 0, fat: 0 }, target);
   const calCeiling = target.calories * 1.4; // prune hopeless-overshoot branches
 
-  const recurse = (idx: number, used: number, cal: number) => {
+  // Running macro totals are threaded through the recursion (not rebuilt per
+  // leaf), so each leaf is O(1) macros instead of O(items) — this is the
+  // /api/recommend hot path.
+  const recurse = (
+    idx: number,
+    used: number,
+    cal: number,
+    protein: number,
+    carbs: number,
+    fat: number,
+  ) => {
     if (used > MAX_DISTINCT_ITEMS || cal > calCeiling) return; // prune
     if (idx === n) {
-      const plate = active
-        .map((item, i) => ({ item, servings: combo[i] }))
-        .filter((p) => p.servings > 0);
-      const d = deviation(plate, target);
+      const d = deviationOf({ calories: cal, protein, carbs, fat }, target);
       if (d < bestDev) {
         bestDev = d;
         bestCombo = combo.slice();
       }
       return;
     }
+    const it = active[idx];
     for (let s = 0; s <= MAX_SERVINGS_PER_ITEM; s++) {
       combo[idx] = s;
-      recurse(idx + 1, used + (s > 0 ? 1 : 0), cal + active[idx].calories * s);
+      recurse(
+        idx + 1,
+        used + (s > 0 ? 1 : 0),
+        cal + it.calories * s,
+        protein + it.protein * s,
+        carbs + it.carbs * s,
+        fat + it.fat * s,
+      );
     }
     combo[idx] = 0;
   };
-  recurse(0, 0, 0);
+  recurse(0, 0, 0, 0, 0, 0);
 
   if (!bestCombo) return [];
   return active

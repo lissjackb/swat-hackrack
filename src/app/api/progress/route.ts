@@ -48,27 +48,32 @@ export async function GET(request: Request) {
 
   const window = dateWindow(date, days);
 
-  // One query each for the whole window, then group in memory.
-  const entries = await db.logEntry.findMany({
-    where: { profileId, date: { in: window } },
-    include: { menuItem: true },
-  });
-  const whoopRows = await db.whoopDay.findMany({
-    where: { profileId, date: { in: window } },
-  });
+  // Both queries cover the whole window and are independent — run concurrently.
+  const [entries, whoopRows] = await Promise.all([
+    db.logEntry.findMany({ where: { profileId, date: { in: window } }, include: { menuItem: true } }),
+    db.whoopDay.findMany({ where: { profileId, date: { in: window } } }),
+  ]);
+
   const whoopByDate = new Map<string, WhoopSnapshot>(
     whoopRows.map((w) => [w.date, { recovery: w.recovery, strain: w.strain, mock: w.mock }]),
   );
+  // Group entries by date in one pass, instead of re-scanning per day.
+  const entriesByDate = new Map<string, typeof entries>();
+  for (const e of entries) {
+    const bucket = entriesByDate.get(e.date) ?? [];
+    bucket.push(e);
+    entriesByDate.set(e.date, bucket);
+  }
 
   const targetFor = (d: string) =>
     computeTargets(profile, whoopByDate.get(d)).daily;
 
-  const week = window.map((d) => {
-    const dayEntries = entries.filter((e) => e.date === d);
-    return dayProgress(d, sumEaten(dayEntries), targetFor(d));
-  });
+  const week = window.map((d) =>
+    dayProgress(d, sumEaten(entriesByDate.get(d) ?? []), targetFor(d)),
+  );
 
-  const daily = week.find((w) => w.date === date) ?? dayProgress(date, sumEaten([]), targetFor(date));
+  // dateWindow always includes `date` (the i=0 element), so this is present.
+  const daily = week.find((w) => w.date === date)!;
 
   return Response.json({ profileId, date, daily, week });
 }

@@ -17,6 +17,7 @@
 // nutrition, never a raw error: the demo must not show a stack trace.
 import { db } from "@/lib/db";
 import { lookupNutrition } from "@/lib/usda";
+import { menuItemToDTO } from "@/lib/menu";
 import type { MenuItemDTO } from "@/lib/types";
 
 export async function GET(request: Request) {
@@ -67,17 +68,8 @@ export async function GET(request: Request) {
       }
     }
 
-    items.push({
-      id: r.id,
-      date: r.date,
-      meal: r.meal as MenuItemDTO["meal"],
-      station: r.station,
-      name: r.name,
-      servingSize: r.servingSize,
-      ...macros,
-      dietary: JSON.parse(r.dietary) as string[],
-      allergens: JSON.parse(r.allergens) as string[],
-    });
+    // Map the row, overriding the four macro fields with the looked-up values.
+    items.push(menuItemToDTO({ ...r, ...macros }));
   }
 
   return Response.json({

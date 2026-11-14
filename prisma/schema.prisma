@@ -68,18 +68,27 @@ model MenuItem {
   @@index([date, meal])
 }
 
-/// "I ate this": one logged item+servings for a profile.
+/// "I ate this": one logged item+servings for a profile. Either a menu item
+/// (menuItemId set, macros from MenuItem) OR a CUSTOM off-menu meal
+/// (menuItemId null, name + inline macros set). Exactly one source is used.
 model LogEntry {
   id         String   @id @default(cuid())
   profileId  String
-  menuItemId String
+  menuItemId String? // null for a custom (off-menu) entry
   date       String // "YYYY-MM-DD"
   meal       String // "breakfast" | "lunch" | "dinner"
   servings   Float    @default(1)
+  // Custom-meal fields — used only when menuItemId is null. For menu entries
+  // these stay null and macros are read from the linked MenuItem.
+  name       String?
+  calories   Float?
+  protein    Float?
+  carbs      Float?
+  fat        Float?
   createdAt  DateTime @default(now())
 
-  profile  Profile  @relation(fields: [profileId], references: [id])
-  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+  profile  Profile   @relation(fields: [profileId], references: [id])
+  menuItem MenuItem? @relation(fields: [menuItemId], references: [id])
 
   @@index([profileId, date])
 }

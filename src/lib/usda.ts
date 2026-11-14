@@ -71,17 +71,12 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 /** Pick the match whose dataType we trust most; fall back to the first food. */
 function bestFood(foods: FdcFood[]): FdcFood | undefined {
   if (foods.length === 0) return undefined;
-  const ranked = [...foods].sort(
-    (a, b) =>
-      DATA_TYPES.indexOf((a.dataType ?? "") as (typeof DATA_TYPES)[number]) -
-      DATA_TYPES.indexOf((b.dataType ?? "") as (typeof DATA_TYPES)[number]),
-  );
-  // Entries with an unknown dataType sort to -1 (front); keep the first
-  // KNOWN-type match if there is one, else just the first food.
-  const known = ranked.find((f) =>
-    DATA_TYPES.includes((f.dataType ?? "") as (typeof DATA_TYPES)[number]),
-  );
-  return known ?? foods[0];
+  // Prefer the highest-priority DATA_TYPES tier that's present; else first.
+  for (const t of DATA_TYPES) {
+    const f = foods.find((x) => x.dataType === t);
+    if (f) return f;
+  }
+  return foods[0];
 }
 
 /**

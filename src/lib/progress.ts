@@ -1,8 +1,7 @@
 // Progress math: eaten macros vs. targets, for the daily bars and week view.
 // Pure functions — the /api/progress route fetches the rows and calls these.
-import type { MacroTargets } from "./types";
-
-const MACROS = ["calories", "protein", "carbs", "fat"] as const;
+import { MACROS, type MacroTargets } from "./types";
+import { localYmd } from "./date";
 
 export interface DayProgress {
   date: string;
@@ -12,13 +11,34 @@ export interface DayProgress {
   pct: MacroTargets;
 }
 
-/** Sum servings × per-item macros across logged entries. */
-export function sumEaten(
-  entries: { servings: number; menuItem: MacroTargets }[],
-): MacroTargets {
+/** One logged entry: a linked menu item, or a custom off-menu meal (inline). */
+export interface LoggedEntry {
+  servings: number;
+  menuItem: MacroTargets | null;
+  calories: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
+}
+
+/** Per-serving macros for an entry: from its menu item, or its inline custom
+ *  values when it's an off-menu entry. */
+export function entryMacros(e: LoggedEntry): MacroTargets {
+  if (e.menuItem) return e.menuItem;
+  return {
+    calories: e.calories ?? 0,
+    protein: e.protein ?? 0,
+    carbs: e.carbs ?? 0,
+    fat: e.fat ?? 0,
+  };
+}
+
+/** Sum servings × per-serving macros across logged entries (menu or custom). */
+export function sumEaten(entries: LoggedEntry[]): MacroTargets {
   const totals: MacroTargets = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   for (const e of entries) {
-    for (const m of MACROS) totals[m] += e.menuItem[m] * e.servings;
+    const per = entryMacros(e);
+    for (const m of MACROS) totals[m] += per[m] * e.servings;
   }
   for (const m of MACROS) totals[m] = Math.round(totals[m]);
   return totals;
@@ -54,11 +74,7 @@ export function dateWindow(endDate: string, days: number): string[] {
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(base);
     d.setDate(base.getDate() - i);
-    out.push(
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-        d.getDate(),
-      ).padStart(2, "0")}`,
-    );
+    out.push(localYmd(d));
   }
   return out;
 }

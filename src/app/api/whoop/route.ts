@@ -8,12 +8,8 @@
 //     WhoopDay so the app never hard-fails.
 import { db } from "@/lib/db";
 import { fetchLiveWhoop } from "@/lib/whoop";
+import { localYmd } from "@/lib/date";
 import type { WhoopSnapshot } from "@/lib/types";
-
-function todayLocal(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -29,7 +25,7 @@ export async function GET(request: Request) {
     const live = await fetchLiveWhoop(profileId);
     if (live) {
       // Cache today's real numbers so targets/progress can reuse them.
-      const day = date ?? todayLocal();
+      const day = date ?? localYmd();
       await db.whoopDay.upsert({
         where: { profileId_date: { profileId, date: day } },
         create: { profileId, date: day, recovery: live.recovery, strain: live.strain, mock: false },

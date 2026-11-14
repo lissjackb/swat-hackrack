@@ -10,6 +10,7 @@ import "dotenv/config";
 import { db } from "../src/lib/db";
 import { computeTargets } from "../src/lib/targets";
 import { recommendPlate, filterByRestrictions } from "../src/lib/recommend";
+import { menuItemToDTO } from "../src/lib/menu";
 import type { Meal, MenuItemDTO, ProfileInput, WhoopSnapshot } from "../src/lib/types";
 
 const DATE = "2026-11-13"; // today — the enriched day
@@ -46,20 +47,7 @@ const PROFILES: TestProfile[] = [
 
 async function itemsFor(meal: Meal): Promise<MenuItemDTO[]> {
   const rows = await db.menuItem.findMany({ where: { date: DATE, meal } });
-  return rows.map((r) => ({
-    id: r.id,
-    date: r.date,
-    meal: r.meal as Meal,
-    station: r.station,
-    name: r.name,
-    servingSize: r.servingSize,
-    calories: r.calories,
-    protein: r.protein,
-    carbs: r.carbs,
-    fat: r.fat,
-    dietary: JSON.parse(r.dietary) as string[],
-    allergens: JSON.parse(r.allergens) as string[],
-  }));
+  return rows.map(menuItemToDTO);
 }
 
 const within = (actual: number, target: number) =>

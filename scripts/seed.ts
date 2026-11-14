@@ -6,12 +6,14 @@
 // (CLAUDE.md "OUT ... week view uses seeded demo history, and we say so").
 import "dotenv/config"; // load DATABASE_URL before the Prisma client (db) reads it
 import { db } from "../src/lib/db";
+import { localYmd } from "../src/lib/date";
 
-// Local YYYY-MM-DD, N days ago.
+// LOCAL YYYY-MM-DD, N days ago. Local (not UTC) so seeded dates match the
+// date keys the whoop/menu/progress routes derive. See src/lib/date.ts.
 function ymd(daysAgo = 0): string {
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);
-  return d.toISOString().slice(0, 10);
+  return localYmd(d);
 }
 
 async function main() {
@@ -60,19 +62,19 @@ async function main() {
       ...fromMeal("dinner"),
     ];
     await db.logEntry.deleteMany({ where: { profileId: profile.id } });
+    const data = [];
     for (let d = 1; d <= 6; d++) {
       for (const item of picks) {
-        await db.logEntry.create({
-          data: {
-            profileId: profile.id,
-            menuItemId: item.id,
-            date: ymd(d),
-            meal: item.meal,
-            servings: 1 + (d % 2),
-          },
+        data.push({
+          profileId: profile.id,
+          menuItemId: item.id,
+          date: ymd(d),
+          meal: item.meal,
+          servings: 1 + (d % 2),
         });
       }
     }
+    await db.logEntry.createMany({ data });
     console.log(`Seeded 6 days of log history (${picks.length} items/day, enriched).`);
   }
 
