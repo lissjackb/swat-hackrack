@@ -1,4 +1,4 @@
-# Hackro (repo: HackRack)
+# Hackro
 
 Tells a Tri-Co student what to put on their plate _before_ they walk into the
 dining hall — matches today's real Swarthmore Dining Center menu to their macro
