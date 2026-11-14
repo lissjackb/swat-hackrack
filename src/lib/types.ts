@@ -5,6 +5,10 @@
 export type Goal = "build" | "maintain" | "cut" | "perform";
 export type Sex = "male" | "female";
 export type Meal = "breakfast" | "lunch" | "dinner";
+/** Every meal value scripts/scrape.ts writes to the DB. `Meal` stays narrow
+ * because Targets.perMeal is a Record<Meal, …>; the planner and the newer
+ * routes use DbMeal (PLANNER_SPEC "Meal slots"). */
+export type DbMeal = Meal | "brunch" | "latenight" | "snack";
 export type ActivityLevel =
   | "sedentary"
   | "light"
@@ -38,13 +42,25 @@ export const MACROS = ["calories", "protein", "carbs", "fat"] as const;
 export interface Targets {
   daily: MacroTargets;
   perMeal: Record<Meal, MacroTargets>;
-  /** How the numbers were derived, for the transparent breakdown in the UI. */
+  /** How the numbers were derived, for the transparent breakdown in the UI
+   * (the How-we-got-it screen reads all of it — PLANNER_SPEC "Targets"). */
   breakdown: {
     bmr: number;
     tdee: number;
     activityFactor: number;
     proteinGPerKg: number;
     note?: string; // e.g. Whoop adjustment explanation
+    /** Goal calorie adjustment vs. maintenance (kcal, signed). */
+    adj?: number;
+    adjNote?: string;
+    /** Safety floor (max of BMR and 1200 F / 1500 M) and whether it applied. */
+    floor?: number;
+    floored?: boolean;
+    /** Calories before the Whoop adjustment (rounded to 10). */
+    base?: number;
+    /** Whoop-added kcal for the day. */
+    dev?: number;
+    afLabel?: string;
   };
 }
 

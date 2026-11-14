@@ -125,9 +125,21 @@ In 1-2 encouraging sentences, explain why this plate fuels their goal. Focus on 
   return callClaude("why-this-plate", { prompt, fallback, maxTokens: 120 });
 }
 
+/** Canned fallback: the mockup's plateWhy template (hackro-mockup.html
+ * 818–825), built from the same numbers Claude would get. */
 function deterministicNote(plate: Plate): string {
   if (plate.items.length === 0) {
     return "No matching items for this meal yet — try loosening a filter or check back when the next menu loads.";
   }
-  return `This plate lands at ${plate.totals.protein}g protein and ${plate.totals.calories} cal — on track for your ${plate.target.protein}g / ${plate.target.calories} cal meal target.`;
+  const ps = [...plate.items].sort(
+    (a, b) => b.item.protein * b.servings - a.item.protein * a.servings,
+  );
+  const lead = ps[0];
+  const carb = ps.find(
+    (pi) => pi !== lead && pi.item.carbs * pi.servings >= 15,
+  );
+  const leadP = Math.round(lead.item.protein * lead.servings);
+  return `Leads with ${lead.item.name.toLowerCase()} for ${leadP} g protein toward your ${plate.target.protein} g target${
+    carb ? `, with ${carb.item.name.toLowerCase()} for the carbs` : ""
+  }.`;
 }

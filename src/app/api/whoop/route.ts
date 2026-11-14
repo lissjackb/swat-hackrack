@@ -51,14 +51,36 @@ export async function GET(request: Request) {
     );
   }
 
-  // Mock path: seeded WhoopDay row.
-  const row = await db.whoopDay.findFirst({
+  // Mock path: seeded/cached WhoopDay row, with fallbacks (PLANNER_SPEC
+  // "Whoop" — without these, every onboarding-created profile 404s because
+  // only demo-profile is seeded, and the demo user would see no adjustment):
+  //   1. the requested profile's row for `date`;
+  //   2. else that profile's most recent row (also covers a seed that ran on
+  //      Friday's date);
+  //   3. else the newest demo-profile row, flagged source:"seed".
+  let row = await db.whoopDay.findFirst({
     where: { profileId, date },
     orderBy: { date: "desc" },
   });
   if (!row) {
+    row = await db.whoopDay.findFirst({ where: { profileId }, orderBy: { date: "desc" } });
+  }
+  let source: string | undefined;
+  if (!row && profileId !== "demo-profile") {
+    row = await db.whoopDay.findFirst({
+      where: { profileId: "demo-profile" },
+      orderBy: { date: "desc" },
+    });
+    if (row) source = "seed";
+  }
+  if (!row) {
     return Response.json({ error: "no whoop data" }, { status: 404 });
   }
-  const snapshot: WhoopSnapshot = { recovery: row.recovery, strain: row.strain, mock: row.mock };
+  const snapshot: WhoopSnapshot & { source?: string } = {
+    recovery: row.recovery,
+    strain: row.strain,
+    mock: row.mock,
+    ...(source ? { source } : {}),
+  };
   return Response.json(snapshot);
 }

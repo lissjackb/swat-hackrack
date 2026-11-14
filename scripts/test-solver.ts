@@ -1,32 +1,35 @@
-// Solver test (demo-check step 4 / solver-test skill).
-// Builds breakfast/lunch/dinner plates for each test profile and checks them
-// against the skill's pass criteria.
+// Solver test (demo-check step 4 / solver-test skill) — now runs the shared
+// DAY planner (src/lib/planner/), which replaced the LP solver
+// (docs/PLANNER_SPEC.md). Pass criteria (the skill's list):
+//   - Day kcal within ±3% of target, or planStatus reports the closest the
+//     menu allows.
+//   - Protein ≥ target − 0.5 g (same reporting escape hatch).
+//   - ZERO conflict() violations — hard FAIL, whatever else passes.
+//   - Eggs ≤ 1 per day, any dish ≤ 2 per day, no S/K-role items chosen as
+//     plate components.
+//   - Under 500 ms per day.
 //
-// DATA SOURCE: the enriched DB for today, NOT data/menu-snapshot.json. The
-// snapshot JSON has no macros (0 cal/protein/...) — nutrition is filled into
-// the DB by /api/nutrition (USDA). The real demo path (/api/recommend) reads
-// the DB too, so testing against it exercises what actually ships.
+// DATA SOURCE: the enriched DB for the demo dates (falls back to the built-in
+// mockup menu when a slot has no usable rows), exactly what /api/plan reads.
 import "dotenv/config";
 import { db } from "../src/lib/db";
 import { computeTargets } from "../src/lib/targets";
-import { recommendPlate, filterByRestrictions } from "../src/lib/recommend";
-import { menuItemToDTO } from "../src/lib/menu";
-import type { Meal, MenuItemDTO, ProfileInput, WhoopSnapshot } from "../src/lib/types";
+import {
+  API_MAP,
+  conflict,
+  createPlanner,
+  famOf,
+  normalizeContext,
+  type PlannerProfile,
+} from "../src/lib/planner";
+import type { ProfileInput } from "../src/lib/types";
+import { profileFromInput } from "../src/lib/planner/context";
 
-const DATE = "2026-11-13"; // today — the enriched day
-const MEALS: Meal[] = ["breakfast", "lunch", "dinner"];
-const TOL = 0.1; // within 10%
+const DEMO_DATES = [...new Set(Object.values(API_MAP).map((q) => q.date))];
+const DAYS = ["sat", "sun"] as const;
 
-interface TestProfile {
-  label: string;
-  profile: ProfileInput;
-  whoop?: WhoopSnapshot;
-}
-
-// restrictions use the keys src/lib/recommend.ts understands: lowercase diet
-// keys (vegan/vegetarian) hit REQUIRES_LABEL; anything else is an allergen
-// matched case-insensitively against item.allergens (so "Peanut","Tree Nut").
-const PROFILES: TestProfile[] = [
+// The solver-test skill's profiles (server units — DB-shaped).
+const PROFILES: { label: string; profile: ProfileInput }[] = [
   {
     label: "Build",
     profile: { name: "Build", goal: "build", heightCm: 183, weightKg: 82, age: 20, sex: "male", activityLevel: "veryActive", restrictions: [] },
@@ -41,112 +44,94 @@ const PROFILES: TestProfile[] = [
   },
   {
     label: "Perform (vegan, peanut+tree nut allergy)",
-    profile: { name: "Perform", goal: "perform", heightCm: 170, weightKg: 63, age: 21, sex: "female", activityLevel: "light", restrictions: ["vegan", "Peanut", "Tree Nut"] },
+    profile: { name: "Perform", goal: "perform", heightCm: 170, weightKg: 63, age: 21, sex: "female", activityLevel: "light", restrictions: ["vegan", "peanut", "tree nut"] },
   },
 ];
 
-async function itemsFor(meal: Meal): Promise<MenuItemDTO[]> {
-  const rows = await db.menuItem.findMany({ where: { date: DATE, meal } });
-  return rows.map(menuItemToDTO);
-}
-
-const within = (actual: number, target: number) =>
-  target === 0 ? actual === 0 : Math.abs(actual - target) / target <= TOL;
-const pct = (actual: number, target: number) =>
-  target === 0 ? "—" : `${Math.round(((actual - target) / target) * 100)}%`;
-
 let anyFail = false;
 
-// Greedy upper bound on protein reachable WITHIN the calorie band: the real
-// constraint is hitting protein AND calories together, not protein alone.
-function maxProteinInBudget(items: MenuItemDTO[], calCeiling: number): number {
-  const byProtein = [...items].filter((i) => i.calories > 0).sort((a, b) => b.protein - a.protein);
-  let cal = 0, protein = 0, picks = 0;
-  for (const i of byProtein) {
-    if (picks >= 4) break;
-    for (let s = 0; s < 2; s++) {
-      if (cal + i.calories > calCeiling) break;
-      cal += i.calories;
-      protein += i.protein;
-      if (s === 0) picks++;
+async function main() {
+  const rows = await db.menuItem.findMany({ where: { date: { in: DEMO_DATES } } });
+  console.log(`Planner test — DB rows: ${rows.length} (${DEMO_DATES.join(", ")})\n`);
+
+  for (const { label, profile } of PROFILES) {
+    console.log(`${label}:`);
+    const p: PlannerProfile = profileFromInput(profile);
+    const planner = createPlanner(rows, normalizeContext({ p, device: null, whoop: null }));
+    const T = planner.targets();
+
+    for (const day of DAYS) {
+      const t0 = performance.now();
+      const meals = planner.plan(day);
+      const ms = performance.now() - t0;
+      const status = planner.planStatus(day);
+
+      const tot = { k: 0, p: 0, c: 0, f: 0 };
+      meals.forEach((x) => { tot.k += x.tot.k; tot.p += x.tot.p; tot.c += x.tot.c; tot.f += x.tot.f; });
+
+      const kcalOk = Math.abs(tot.k - T.kcal) <= T.kcal * 0.03 + 1;
+      const protOk = tot.p >= T.p - 0.5;
+      const timeOk = ms < 500;
+
+      // Hard constraint: zero conflict() violations anywhere (plate parts AND
+      // ranked alternatives, which feed swaps).
+      const violations: string[] = [];
+      const fam: Record<string, number> = {};
+      const eggMeals = new Set<string>();
+      let roleBad = "";
+      for (const x of meals) {
+        for (const pp of x.parts) {
+          if (conflict(pp.it, p)) violations.push(`${x.m.id}:${pp.it.name}`);
+          fam[famOf(pp.it.name)] = (fam[famOf(pp.it.name)] || 0) + 1;
+          if (famOf(pp.it.name) === "egg") eggMeals.add(x.m.id);
+          if (["S", "K"].includes(pp.it.nut![6]) && !pp.user) roleBad = pp.it.name;
+        }
+        for (const r of x.ranked) for (const pp of r.parts) {
+          if (conflict(pp.it, p)) violations.push(`${x.m.id}(alt):${pp.it.name}`);
+        }
+      }
+      // Egg cap applies across meals (see test-planner's note on the mockup's
+      // within-plate okV gap, ported as-is).
+      const eggsOk = eggMeals.size <= 1;
+      const dupes = Object.entries(fam).filter(([k, v]) => k !== "egg" && v > 2);
+
+      const reported = !kcalOk || !protOk ? !!status.msg : true; // miss must be reported
+      const pass = violations.length === 0 && eggsOk && dupes.length === 0 && !roleBad && timeOk &&
+        ((kcalOk && protOk) || reported);
+      if (!pass) anyFail = true;
+
+      const flags: string[] = [];
+      if (!kcalOk) flags.push(`kcal ${Math.round(tot.k)} vs ${T.kcal} ±3%${status.msg ? ` (reported: "${status.msg}")` : " UNREPORTED"}`);
+      if (!protOk) flags.push(`protein ${Math.round(tot.p)} < ${T.p}${status.msg ? ` (reported)` : " UNREPORTED"}`);
+      if (violations.length) flags.push(`CONFLICT VIOLATION: ${violations.join(", ")}`);
+      if (!eggsOk) flags.push(`egg dishes in ${eggMeals.size} meals`);
+      if (dupes.length) flags.push(`dish >2/day: ${dupes.map(([k, v]) => `${k}×${v}`).join(", ")}`);
+      if (roleBad) flags.push(`S/K-role component: ${roleBad}`);
+      if (!timeOk) flags.push(`slow ${ms.toFixed(0)}ms`);
+
+      console.log(
+        `  ${day.padEnd(4)} ${pass ? "PASS" : "FAIL"}  ` +
+        `kcal ${String(Math.round(tot.k)).padStart(4)}/${String(T.kcal).padStart(4)}  ` +
+        `P ${String(Math.round(tot.p)).padStart(3)}/${String(T.p).padStart(3)}  ` +
+        `C ${String(Math.round(tot.c)).padStart(3)}  F ${String(Math.round(tot.f)).padStart(3)}  ` +
+        `[${meals.length} meals, ${ms.toFixed(0)}ms]` +
+        (flags.length ? `  <= ${flags.join("; ")}` : ""),
+      );
     }
   }
-  return protein;
-}
 
-async function testPlate(label: string, meal: Meal, p: TestProfile) {
-  const target = computeTargets(p.profile, p.whoop).perMeal[meal];
-  const all = await itemsFor(meal);
-  const candidates = filterByRestrictions(all, p.profile.restrictions);
-
-  const t0 = performance.now();
-  const plate = recommendPlate(all, target, p.profile.restrictions);
-  const ms = performance.now() - t0;
-
-  const distinct = plate.items.length;
-  const maxServings = plate.items.reduce((m, pi) => Math.max(m, pi.servings), 0);
-
-  // Hard constraint: re-verify no plate item violates restrictions.
-  const violations = plate.items.filter(
-    (pi) => !filterByRestrictions([pi.item], p.profile.restrictions).length,
-  );
-
-  // Can the menu hit the protein target while keeping calories in range?
-  const reachable = maxProteinInBudget(candidates, target.calories * (1 + TOL));
-  const menuLimited = reachable < target.protein * (1 - TOL);
-
-  const calOk = within(plate.totals.calories, target.calories);
-  const proOk = within(plate.totals.protein, target.protein);
-  const constraintsOk = distinct <= 4 && maxServings <= 2;
-  const timeOk = ms < 500;
-  const allergenOk = violations.length === 0;
-  const pass = calOk && proOk && constraintsOk && timeOk && allergenOk;
-
-  // A protein-only miss that the menu can't satisfy within the calorie budget
-  // is a documented menu limitation, not a solver defect (skill: report it,
-  // don't force it). Everything else failing is a real FAIL.
-  const underProteinOnly = calOk && !proOk && plate.totals.protein < target.protein;
-  const limited = !pass && underProteinOnly && constraintsOk && timeOk && allergenOk && menuLimited;
-  if (!pass && !limited) anyFail = true;
-  const status = pass ? "PASS" : limited ? "LIMIT" : "FAIL";
-
-  const flags: string[] = [];
-  if (!calOk) flags.push(`cal ${pct(plate.totals.calories, target.calories)}`);
-  if (!proOk) flags.push(`protein ${pct(plate.totals.protein, target.protein)}`);
-  if (!constraintsOk) flags.push(`shape ${distinct} items / ${maxServings} max-servings`);
-  if (!timeOk) flags.push(`slow ${ms.toFixed(0)}ms`);
-  if (!allergenOk) flags.push(`ALLERGEN/DIET VIOLATION: ${violations.map((v) => v.item.name).join(", ")}`);
-  if (limited) flags.push(`menu-limited: this menu tops out at ~${Math.round(reachable)}g protein within the ${Math.round(target.calories * (1 + TOL))} kcal budget`);
-
-  console.log(
-    `  ${meal.padEnd(9)} ${status}  ` +
-      `kcal ${String(plate.totals.calories).padStart(4)}/${String(target.calories).padStart(4)}  ` +
-      `P ${String(plate.totals.protein).padStart(3)}/${String(target.protein).padStart(3)}  ` +
-      `C ${String(plate.totals.carbs).padStart(3)}/${String(target.carbs).padStart(3)}  ` +
-      `F ${String(plate.totals.fat).padStart(3)}/${String(target.fat).padStart(3)}  ` +
-      `[${distinct} items, ${ms.toFixed(0)}ms]` +
-      (flags.length ? `  <= ${flags.join("; ")}` : ""),
-  );
-}
-
-async function main() {
-  console.log(`Solver test — enriched DB, date ${DATE}\n`);
-  for (const p of PROFILES) {
-    console.log(`${p.label}:`);
-    for (const meal of MEALS) await testPlate(p.label, meal, p);
-  }
-
-  // Whoop adjustment: Build profile, high strain then red recovery.
+  // Whoop adjustment direction (computeTargets wraps the same planner rule, so
+  // /api/targets and /api/progress agree with the screen).
   console.log(`\nWhoop adjustment (Build profile):`);
   const build = PROFILES[0].profile;
   const base = computeTargets(build).daily;
   const highStrain = computeTargets(build, { strain: 18, recovery: 60, mock: true }).daily;
   const redRecovery = computeTargets(build, { strain: 8, recovery: 25, mock: true }).daily;
   console.log(`  base:         ${base.calories} kcal, ${base.protein}g protein, ${base.carbs}g carbs`);
-  console.log(`  high strain:  ${highStrain.calories} kcal, ${highStrain.protein}g protein, ${highStrain.carbs}g carbs  (expect MORE cal/carbs)`);
-  console.log(`  red recovery: ${redRecovery.calories} kcal, ${redRecovery.protein}g protein, ${redRecovery.carbs}g carbs  (expect MORE protein)`);
-  const strainOk = highStrain.calories > base.calories && highStrain.carbs > base.carbs;
-  const recoveryOk = redRecovery.protein > base.protein;
+  console.log(`  high strain:  ${highStrain.calories} kcal (+${highStrain.calories - base.calories}), ${highStrain.protein}g protein, ${highStrain.carbs}g carbs  (expect +150 kcal to carbs)`);
+  console.log(`  red recovery: ${redRecovery.calories} kcal, ${redRecovery.protein}g protein (expect ×1.1), ${redRecovery.carbs}g carbs`);
+  const strainOk = highStrain.calories === base.calories + 150 && highStrain.carbs > base.carbs;
+  const recoveryOk = redRecovery.protein === Math.round(base.protein * 1.1);
   if (!strainOk || !recoveryOk) anyFail = true;
   console.log(`  strain shift ${strainOk ? "OK" : "FAIL"}, recovery shift ${recoveryOk ? "OK" : "FAIL"}`);
 

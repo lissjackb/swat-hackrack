@@ -1,170 +1,69 @@
-// LP solver: pick items + servings from one meal that get closest to the
-// meal's macro target, while NEVER violating dietary/allergen restrictions.
+// Plate recommendation — now a thin wrapper over the shared planner
+// (src/lib/planner/), which replaced the LP solver (docs/PLANNER_SPEC.md:
+// the LP planned one meal in isolation, allowed any 4 items, and its
+// restriction filter had bugs). `conflict()` is the hard filter everywhere.
 //
-// Restrictions are HARD constraints — enforced by pre-filtering the item
-// list, not by the LP. The LP then optimizes macros over what's left.
-//
-// Objective: minimize the weighted RELATIVE deviation from the meal's four
-// macro targets (calories + protein weighted hardest; carbs + fat lighter),
-// so plates HIT targets instead of maxing one macro. Modeled with per-macro
-// over/under slack variables: `actual_m - over_m + under_m = target_m`.
-//
-// Two-stage solve (jsLPSolver's integer branch-and-bound hangs past ~12
-// items, so we don't use it):
-//   1. CONTINUOUS LP relaxation over all eligible items — pure simplex, fast
-//      and reliable, with a ≤2-servings cap per item. Gives fractional
-//      servings; its optimal basis activates only a handful of items.
-//   2. Brute-force the best INTEGER plate (0..2 servings each, ≤4 distinct
-//      items) over just that small active set. Exact and ~instant.
-import solver from "javascript-lp-solver";
+// @deprecated Prefer POST /api/plan (whole-day planning). recommendPlate
+// stays for /api/recommend compatibility and test tooling: it ranks ONE
+// meal's realistic plates (main + carb + side) against the given target.
+// Servings can be fractional, in 0.5 steps.
 import { MACROS, type MacroTargets, type MenuItemDTO, type Plate, type PlateItem } from "./types";
+import { conflict } from "./planner/restrictions";
+import { rowToPlannerItem, type PlannerItem } from "./planner/items";
+import { rankItems } from "./planner/plan";
+import type { PlannerProfile } from "./planner/context";
 
-const MAX_SERVINGS_PER_ITEM = 2; // realistic portion cap (skill: ≤2 each)
-const MAX_DISTINCT_ITEMS = 4; // keep plates simple (skill: ≤4 items)
-const ACTIVE_SET = 10; // items carried into the integer brute force
+/** A restrictions[] array → the minimal profile conflict() reads. */
+export function profileFromRestrictions(restrictions: string[]): PlannerProfile {
+  const r = restrictions.map((x) => String(x).toLowerCase());
+  return {
+    goal: "maintain",
+    sex: "male",
+    age: 20,
+    restrictions: r,
+    halal: r.includes("halal"),
+    never: [],
+  };
+}
 
-// Relative importance per macro. Calories + protein are the demo's pass
-// criteria (within 10%); carbs + fat matter but shouldn't dominate.
-const MACRO_IMPORTANCE = { calories: 1, protein: 1.2, carbs: 0.3, fat: 0.3 };
-
-// Dietary restriction -> required label present on the item.
-const REQUIRES_LABEL: Record<string, string> = {
-  vegan: "Vegan",
-  vegetarian: "Vegetarian",
-  halal: "Halal",
-  kosher: "Kosher",
-  glutenFree: "Gluten Free",
-};
-
-/** Drop any item an allergen/diet restriction forbids. Hard filter. */
+/**
+ * Drop any item an allergen/diet restriction forbids. Hard filter — kept as
+ * a wrapper over the planner's conflict() so existing callers (test-solver)
+ * still compile. Fixes the LP filter's bugs: vegetarian keeps vegan-labeled
+ * items, halal applies to meat only, pescatarian works, items with NO
+ * allergen data are excluded for anyone with an allergy (fail closed), and
+ * a gluten allergy excludes wheat.
+ */
 export function filterByRestrictions(
   items: MenuItemDTO[],
   restrictions: string[],
 ): MenuItemDTO[] {
-  return items.filter((item) => {
-    for (const r of restrictions) {
-      const required = REQUIRES_LABEL[r];
-      if (required) {
-        // Diet restriction: item must carry the label.
-        if (!item.dietary.includes(required)) return false;
-      } else {
-        // Treat anything else as an allergen to avoid (case-insensitive).
-        const hit = item.allergens.some(
-          (a) => a.toLowerCase() === r.toLowerCase(),
-        );
-        if (hit) return false;
-      }
-    }
-    return true;
+  const p = profileFromRestrictions(restrictions);
+  return items.filter((dto) => {
+    const it = toPlannerItem(dto);
+    return it !== null && !conflict(it, p);
   });
 }
 
-/** Weighted relative deviation of macro totals from the targets. */
-function deviationOf(totals: MacroTargets, target: MacroTargets): number {
-  return MACROS.reduce(
-    (acc, m) => acc + (MACRO_IMPORTANCE[m] * Math.abs(totals[m] - target[m])) / (target[m] || 1),
-    0,
-  );
+/** DTO → PlannerItem (null when it has no macros and no built-in estimate). */
+function toPlannerItem(dto: MenuItemDTO): PlannerItem | null {
+  return rowToPlannerItem({
+    id: dto.id,
+    date: dto.date,
+    meal: dto.meal,
+    station: dto.station,
+    name: dto.name,
+    calories: dto.calories,
+    protein: dto.protein,
+    carbs: dto.carbs,
+    fat: dto.fat,
+    dietary: dto.dietary,
+    allergens: dto.allergens,
+  });
 }
 
 /**
- * Stage 1 — continuous LP relaxation. Returns fractional servings per item id.
- * No integer vars, so jsLPSolver runs plain simplex (fast, never hangs).
- */
-function relaxedServings(
-  items: MenuItemDTO[],
-  target: MacroTargets,
-): Record<string, number> {
-  const variables: Record<string, Record<string, number>> = {};
-  const constraints: Record<string, { min?: number; max?: number; equal?: number }> = {};
-
-  for (const item of items) {
-    const cap = `cap_${item.id}`;
-    variables[item.id] = {
-      bal_calories: item.calories,
-      bal_protein: item.protein,
-      bal_carbs: item.carbs,
-      bal_fat: item.fat,
-      [cap]: 1,
-    };
-    constraints[cap] = { max: MAX_SERVINGS_PER_ITEM };
-  }
-  for (const m of MACROS) {
-    constraints[`bal_${m}`] = { equal: Math.max(0, Math.round(target[m])) };
-    const w = MACRO_IMPORTANCE[m] / (target[m] || 1);
-    variables[`over_${m}`] = { [`bal_${m}`]: -1, dev: w };
-    variables[`under_${m}`] = { [`bal_${m}`]: 1, dev: w };
-  }
-
-  const result = solver.Solve({
-    optimize: "dev",
-    opType: "min" as const,
-    constraints,
-    variables,
-  }) as Record<string, number> & { feasible: boolean };
-
-  return result.feasible ? result : {};
-}
-
-/**
- * Stage 2 — exhaustively pick the best integer plate over a small active set:
- * 0..MAX_SERVINGS_PER_ITEM servings each, at most MAX_DISTINCT_ITEMS items,
- * minimizing weighted deviation. active.length ≤ ACTIVE_SET keeps this tiny.
- */
-function bestIntegerPlate(
-  active: MenuItemDTO[],
-  target: MacroTargets,
-): { item: MenuItemDTO; servings: number }[] {
-  const n = active.length;
-  const combo = new Array<number>(n).fill(0);
-  let bestCombo: number[] | null = null;
-  let bestDev = deviationOf({ calories: 0, protein: 0, carbs: 0, fat: 0 }, target);
-  const calCeiling = target.calories * 1.4; // prune hopeless-overshoot branches
-
-  // Running macro totals are threaded through the recursion (not rebuilt per
-  // leaf), so each leaf is O(1) macros instead of O(items) — this is the
-  // /api/recommend hot path.
-  const recurse = (
-    idx: number,
-    used: number,
-    cal: number,
-    protein: number,
-    carbs: number,
-    fat: number,
-  ) => {
-    if (used > MAX_DISTINCT_ITEMS || cal > calCeiling) return; // prune
-    if (idx === n) {
-      const d = deviationOf({ calories: cal, protein, carbs, fat }, target);
-      if (d < bestDev) {
-        bestDev = d;
-        bestCombo = combo.slice();
-      }
-      return;
-    }
-    const it = active[idx];
-    for (let s = 0; s <= MAX_SERVINGS_PER_ITEM; s++) {
-      combo[idx] = s;
-      recurse(
-        idx + 1,
-        used + (s > 0 ? 1 : 0),
-        cal + it.calories * s,
-        protein + it.protein * s,
-        carbs + it.carbs * s,
-        fat + it.fat * s,
-      );
-    }
-    combo[idx] = 0;
-  };
-  recurse(0, 0, 0, 0, 0, 0);
-
-  if (!bestCombo) return [];
-  return active
-    .map((item, i) => ({ item, servings: bestCombo![i] }))
-    .filter((p) => p.servings > 0);
-}
-
-/**
- * Recommend a plate for one meal.
+ * Recommend a plate for one meal (deprecated — see header).
  * @param items     candidate items for the meal (already this meal/day)
  * @param target    per-meal macro target
  * @param restrictions student's hard restrictions
@@ -174,32 +73,31 @@ export function recommendPlate(
   target: MacroTargets,
   restrictions: string[] = [],
 ): Plate {
-  // Hard filter first; then drop 0-calorie items (no USDA match / water-type)
-  // so they can't be used as "free" filler that fools the calorie balance.
-  const eligible = filterByRestrictions(items, restrictions).filter(
-    (i) => i.calories > 0,
-  );
-
-  // Stage 1: continuous LP, then take the items it leaned on most, UNION the
-  // most protein-dense items. The LP can under-surface high-protein picks
-  // (they overshoot calories fractionally), yet protein is the hardest target
-  // to hit — so guarantee the brute force always gets to consider them.
-  const relaxed = relaxedServings(eligible, target);
-  const byLp = eligible
-    .filter((i) => (relaxed[i.id] ?? 0) > 0.05)
-    .sort((a, b) => (relaxed[b.id] ?? 0) - (relaxed[a.id] ?? 0));
-  const byProtein = [...eligible].sort((a, b) => b.protein - a.protein);
-  const active: MenuItemDTO[] = [];
+  const p = profileFromRestrictions(restrictions);
+  const byId = new Map<string, MenuItemDTO>();
+  const eligible: PlannerItem[] = [];
   const seen = new Set<string>();
-  for (const i of [...byLp, ...byProtein]) {
-    if (active.length >= ACTIVE_SET) break;
-    if (seen.has(i.id)) continue;
-    seen.add(i.id);
-    active.push(i);
+  for (const dto of items) {
+    const it = toPlannerItem(dto);
+    if (!it || conflict(it, p)) continue;
+    if (seen.has(it.name)) continue; // same dish at two stations
+    seen.add(it.name);
+    byId.set(it.name, dto);
+    eligible.push(it);
   }
 
-  // Stage 2: exact integer plate over that small set.
-  const plateItems: PlateItem[] = bestIntegerPlate(active, target);
+  // Meal kind drives the plate template (breakfast/brunch lead with fruit
+  // sides; everything else is a standard meal).
+  const meal = items[0]?.meal as string | undefined;
+  const kind = meal === "breakfast" || meal === "brunch" ? "breakfast" : "meal";
+
+  const ranked = rankItems(kind, eligible, { k: target.calories, p: target.protein });
+  const top = ranked[0];
+
+  const plateItems: PlateItem[] = (top?.parts ?? []).map((pp) => ({
+    item: byId.get(pp.it.name)!,
+    servings: pp.m,
+  }));
 
   const totals: MacroTargets = { calories: 0, protein: 0, carbs: 0, fat: 0 };
   for (const { item, servings } of plateItems) {

@@ -1,92 +1,52 @@
 // Profile -> daily & per-meal macro targets.
-// Mifflin-St Jeor BMR x activity factor, protein set in g/kg, fat as a
-// % of calories, carbs as the remainder. Everything here is intentionally
-// transparent so the UI can show the student exactly how we got the numbers.
-import type {
-  ActivityLevel,
-  Goal,
-  Meal,
-  ProfileInput,
-  Targets,
-  WhoopSnapshot,
-} from "./types";
+// Thin wrapper over src/lib/planner/targets.ts (PLANNER_SPEC "Targets: one
+// formula, matching the mockup"). Keeps the computeTargets signature and the
+// Targets shape because /api/targets, /api/progress and test-solver use them.
+//
+// The mockup rules (now the single formula, client and server):
+//   Mifflin-St Jeor BMR × activity factor → TDEE.
+//   Cut −min(20% TDEE, 500) · Build +min(350, 15% TDEE) ·
+//   Perform +min(150, 15% TDEE) · Maintain +0.
+//   Floor at max(BMR, 1200 F / 1500 M), round to 10.
+//   Fat 27% of base · protein g/kg per goal · carbs the remainder.
+//   Whoop: strain/recovery adjustment (planner/targets.ts whoopAdjustment),
+//   capped with the goal adjustment at +500 kcal over TDEE.
+import type { ProfileInput, Targets, WhoopSnapshot, Meal } from "./types";
+import { GOALS, MEALS } from "./planner/data";
+import { profileFromInput, normalizeContext } from "./planner/context";
+import { targets as plannerTargets } from "./planner/targets";
 
-const ACTIVITY_FACTOR: Record<ActivityLevel, number> = {
-  sedentary: 1.2,
-  light: 1.375,
-  moderate: 1.55,
-  active: 1.725,
-  veryActive: 1.9,
-};
-
-// Calorie adjustment vs. maintenance, and protein target, per goal.
-const GOAL_CALORIE_MULT: Record<Goal, number> = {
-  cut: 0.8,
-  maintain: 1.0,
-  build: 1.1,
-  perform: 1.05,
-};
-const GOAL_PROTEIN_G_PER_KG: Record<Goal, number> = {
-  cut: 2.2,
-  maintain: 1.6,
-  build: 2.0,
-  perform: 1.8,
-};
-
-// Share of daily calories/macros per meal. Must sum to 1.
-const MEAL_SPLIT: Record<Meal, number> = {
-  breakfast: 0.3,
-  lunch: 0.35,
-  dinner: 0.35,
-};
-
-const FAT_CALORIE_SHARE = 0.27; // ~27% of calories from fat
-
-function mifflinStJeor(p: ProfileInput): number {
-  const base = 10 * p.weightKg + 6.25 * p.heightCm - 5 * p.age;
-  return p.sex === "male" ? base + 5 : base - 161;
-}
+/** perMeal shares: the Saturday MEALS shares (sat-b .26, sat-l .32, sat-d
+ * .32), normalized over those three (PLANNER_SPEC). */
+const SAT_SHARES: Record<Meal, number> = (() => {
+  const ids: Record<string, Meal> = { "sat-b": "breakfast", "sat-l": "lunch", "sat-d": "dinner" };
+  const rows = MEALS.filter((m) => ids[m.id]);
+  const tot = rows.reduce((a, m) => a + m.share, 0);
+  return Object.fromEntries(rows.map((m) => [ids[m.id], m.share / tot])) as Record<Meal, number>;
+})();
 
 /**
- * Compute daily and per-meal targets for a profile.
- * Pass a Whoop snapshot to nudge the day (more carbs after high strain,
- * recovery-friendly on red recovery). See adjustForWhoop below.
+ * Compute daily and per-meal targets for a profile. Pass a Whoop snapshot to
+ * adjust the day from the REAL numbers (more carbs after high strain, more
+ * protein on red recovery). Same function the planner uses, so /api/progress
+ * and /api/plan always agree with the screen.
  */
 export function computeTargets(
   p: ProfileInput,
   whoop?: WhoopSnapshot,
 ): Targets {
-  const bmr = mifflinStJeor(p);
-  const activityFactor = ACTIVITY_FACTOR[p.activityLevel];
-  const tdee = bmr * activityFactor;
+  const ctx = normalizeContext({
+    p: profileFromInput(p),
+    device: whoop ? "whoop" : null,
+    perms: { recovery: true },
+    whoop: whoop ?? null,
+  });
+  const T = plannerTargets(ctx);
 
-  let calories = tdee * GOAL_CALORIE_MULT[p.goal];
-  const proteinGPerKg = GOAL_PROTEIN_G_PER_KG[p.goal];
-  let protein = proteinGPerKg * p.weightKg;
-  let fat = (calories * FAT_CALORIE_SHARE) / 9;
-  let note: string | undefined;
-
-  if (whoop) {
-    const adj = adjustForWhoop({ calories, protein, fat }, whoop);
-    calories = adj.calories;
-    protein = adj.protein;
-    fat = adj.fat;
-    note = adj.note;
-  }
-
-  // Carbs are the remainder: protein & carbs 4 cal/g, fat 9 cal/g.
-  const carbs = Math.max(0, (calories - protein * 4 - fat * 9) / 4);
-
-  const daily = {
-    calories: Math.round(calories),
-    protein: Math.round(protein),
-    carbs: Math.round(carbs),
-    fat: Math.round(fat),
-  };
-
+  const daily = { calories: T.kcal, protein: T.p, carbs: T.c, fat: T.f };
   const perMeal = Object.fromEntries(
-    (Object.keys(MEAL_SPLIT) as Meal[]).map((meal) => {
-      const s = MEAL_SPLIT[meal];
+    (Object.keys(SAT_SHARES) as Meal[]).map((meal) => {
+      const s = SAT_SHARES[meal];
       return [
         meal,
         {
@@ -102,39 +62,19 @@ export function computeTargets(
   return {
     daily,
     perMeal,
-    breakdown: { bmr: Math.round(bmr), tdee: Math.round(tdee), activityFactor, proteinGPerKg, note },
-  };
-}
-
-/**
- * Whoop "thin slice": nudge today's macros based on recovery/strain.
- * Deliberately gentle. Tune these during the Whoop build.
- */
-function adjustForWhoop(
-  base: { calories: number; protein: number; fat: number },
-  whoop: WhoopSnapshot,
-): { calories: number; protein: number; fat: number; note: string } {
-  let { calories, protein, fat } = base;
-  const notes: string[] = [];
-
-  // High strain -> fuel it: +~10% calories, carb-leaning (via lower fat share).
-  if (whoop.strain >= 14) {
-    calories *= 1.1;
-    fat *= 0.95;
-    notes.push(`high strain (${whoop.strain.toFixed(1)}) → more fuel, carb-leaning`);
-  }
-  // Red recovery -> protect recovery: a little more protein.
-  if (whoop.recovery < 34) {
-    protein *= 1.1;
-    notes.push(`low recovery (${whoop.recovery}%) → extra protein`);
-  }
-
-  return {
-    calories,
-    protein,
-    fat,
-    note: notes.length
-      ? `Whoop adjustment: ${notes.join("; ")}.`
-      : "Whoop: green day, targets unchanged.",
+    breakdown: {
+      bmr: T.bmr,
+      tdee: T.tdee,
+      activityFactor: T.af,
+      proteinGPerKg: GOALS[p.goal].pk,
+      note: T.devNote,
+      adj: T.adj,
+      adjNote: T.adjNote,
+      floor: T.floor,
+      floored: T.floored,
+      base: T.base,
+      dev: T.dev,
+      afLabel: T.afLabel,
+    },
   };
 }

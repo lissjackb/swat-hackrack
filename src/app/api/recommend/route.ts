@@ -1,15 +1,18 @@
-// POST /api/recommend — recommend a plate for one meal.
-// Body: { meal, date, target, restrictions? }. Pulls the meal's items,
-// runs the LP solver, then asks Claude for the "why this plate" note.
+// POST /api/recommend — recommend a plate for ONE meal.
+// @deprecated Kept for compatibility (PLANNER_SPEC "API") — prefer
+// POST /api/plan, which plans the whole day with the shared planner.
+// Body: { meal, date, target, restrictions? }. Pulls the meal's items, ranks
+// realistic plates (planner rank(); servings may be fractional in 0.5
+// steps), then asks Claude for the "why this plate" note.
 import { db } from "@/lib/db";
 import { recommendPlate } from "@/lib/recommend";
 import { explainPlate } from "@/lib/claude";
 import { menuItemToDTO } from "@/lib/menu";
-import type { MacroTargets, Meal } from "@/lib/types";
+import type { DbMeal, MacroTargets } from "@/lib/types";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
-    meal: Meal;
+    meal: DbMeal;
     date: string;
     target: MacroTargets;
     restrictions?: string[];
