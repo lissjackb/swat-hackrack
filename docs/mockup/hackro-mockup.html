@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hackro — Swarthmore demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090A;--s1:#141618;--s2:#1C1F22;--line:#24282C;--tx:#F5F6F7;--t2:#B4BAC1;--t3:#8C939B;--garnet:#A8233A;--garnet-t:#E35D73;--lime:#B8F135;--amber:#FFB020;--orange:#FF9432;--blue:#4DA3FF;--violet:#9B8CFF;--green:#34D399;--red:#FF5A5A;--fat:#C9CED4}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:400 15px/1.4 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+button:disabled{cursor:not-allowed}
+input,select{font:inherit;color:var(--tx)}
+:focus-visible{outline:2px solid var(--garnet-t);outline-offset:2px}
+@keyframes sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+#app{max-width:430px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative;display:flex;flex-direction:column;background:var(--bg)}
+@media (min-width:600px){body{background:#050506}#app{border-left:1px solid #121416;border-right:1px solid #121416}}
+.bd{padding:16px 20px 40px;display:flex;flex-direction:column;gap:32px;flex:1;animation:fade .25s ease}
+.g{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:12px}
+.sb{justify-content:space-between}
+.lbl{font:600 13px/1 'Barlow Condensed',sans-serif;letter-spacing:1.3px;text-transform:uppercase;color:var(--t2)}
+.h1{margin:0;font:700 34px/1.04 'Barlow Condensed',sans-serif;text-wrap:balance}
+.sub{margin:0;color:var(--t2);font-size:15px;line-height:1.45;text-wrap:pretty}
+.n{font-family:'Barlow Condensed',sans-serif;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.u{font:500 13px Inter,sans-serif;color:var(--t2)}
+.t2{color:var(--t2)}.t3{color:var(--t3)}.lime{color:var(--lime)}
+.card{background:var(--s1);border-radius:24px;padding:16px}
+.list>*+*{border-top:1px solid var(--line)}
+.li{display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;text-align:left}
+.tr{height:4px;border-radius:999px;background:var(--line);overflow:hidden}
+.fl{height:100%;border-radius:999px;transition:width .5s ease}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tile{width:40px;height:40px;border-radius:8px;background:var(--s2);color:var(--t2);display:flex;align-items:center;justify-content:center;flex:none}
+.cta{height:56px;border-radius:16px;background:var(--garnet);color:#fff;font:700 16px Inter,sans-serif;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:filter .15s}
+.cta:hover{filter:brightness(1.08)}
+.cta:disabled{background:var(--s2);color:var(--t3);filter:none}
+.cta.inr{border-radius:8px;height:52px}
+.ghost{height:52px;border-radius:16px;color:var(--tx);font:600 15px Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.ghost.fill{background:var(--s1)}
+.card .ghost.fill{background:var(--s2);border-radius:8px}
+.ib{width:44px;height:44px;border-radius:999px;background:var(--s1);display:flex;align-items:center;justify-content:center;flex:none}
+.top{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;text-align:center}
+.chip{height:36px;padding:0 14px;border-radius:999px;background:var(--s1);color:var(--tx);font:600 13px Inter,sans-serif;white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--tx);color:var(--bg)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.scrollx{display:flex;gap:8px;overflow-x:auto;margin:0 -20px;padding:0 20px;scrollbar-width:none}
+.scrollx::-webkit-scrollbar{display:none}
+.opt{width:100%;text-align:left;background:var(--s1);border-radius:20px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:inset 0 0 0 0 var(--lime);transition:box-shadow .15s}
+.opt.on{box-shadow:inset 0 0 0 2px var(--lime)}
+.radio{width:22px;height:22px;border-radius:999px;box-shadow:inset 0 0 0 1.5px #5A6068;flex:none;display:flex;align-items:center;justify-content:center}
+.opt.on .radio{box-shadow:inset 0 0 0 7px var(--lime)}
+.field{display:flex;flex-direction:column;gap:8px}
+.field>span{font:600 13px/1 'Barlow Condensed',sans-serif;letter-spacing:1.3px;text-transform:uppercase;color:var(--t2)}
+.inp{height:52px;border-radius:16px;background:var(--s1);border:0;padding:0 16px;font:500 16px Inter,sans-serif;width:100%;outline:none}
+.inp:focus{box-shadow:inset 0 0 0 1.5px var(--t3)}
+.inp::placeholder{color:var(--t3)}
+.stepper{display:flex;align-items:center;justify-content:space-between;height:52px;border-radius:16px;background:var(--s1);padding:0 6px}
+.stepper button{width:40px;height:40px;border-radius:999px;background:var(--s2);display:flex;align-items:center;justify-content:center}
+.seg{display:grid;gap:4px;background:var(--s1);border-radius:16px;padding:4px}
+.seg button{height:44px;border-radius:12px;font:600 14px Inter,sans-serif;color:var(--t2)}
+.seg button.on{background:var(--s2);color:var(--tx)}
+.tog{width:48px;height:28px;border-radius:999px;background:#2C3036;position:relative;flex:none;transition:background .15s}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:999px;background:#fff;transition:transform .15s}
+.tog.on{background:var(--lime)}
+.tog.on::after{transform:translateX(20px);background:#08090A}
+.tabs{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:8px 6px calc(14px + env(safe-area-inset-bottom));background:rgba(8,9,10,.94);backdrop-filter:blur(12px);border-top:1px solid var(--s2);z-index:5}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 2px;font:600 11px Inter,sans-serif;color:var(--t3)}
+.tab .i{width:22px;height:22px}
+.tab.on{color:var(--tx)}
+.tab.on::before{content:"";position:absolute;top:-9px;width:28px;height:2px;border-radius:2px;background:var(--garnet-t)}
+.sk{border-radius:8px;background:linear-gradient(90deg,#1F2226 0%,#2C3036 50%,#1F2226 100%);background-size:200% 100%;animation:sh 1.4s linear infinite}
+.spin{animation:spin .9s linear infinite}
+.meal{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:start;padding:14px 12px;border-radius:16px;width:100%;text-align:left}
+.mt{font:600 16px/1 'Barlow Condensed',sans-serif;color:var(--t2);padding-top:2px}
+.prog{display:grid;gap:6px}
+.prog>span{height:3px;border-radius:2px;background:var(--s2)}
+.prog>span.on{background:var(--tx)}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{width:100%;max-width:430px;background:var(--s1);border-radius:24px 24px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:20px;animation:up .25s ease;max-height:92vh;overflow:auto}
+.sheet .in{background:var(--s2);border-radius:8px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--tx);color:var(--bg);font:600 14px Inter,sans-serif;padding:12px 16px;border-radius:14px;z-index:30;display:flex;gap:8px;align-items:center;animation:up .2s;max-width:calc(100% - 40px)}
+.warn{color:var(--red)}
+.ok{color:var(--green)}
+.check{display:flex;align-items:center;gap:12px;font-size:15px}
+.check .dot{width:22px;height:22px;border-radius:999px;flex:none;display:flex;align-items:center;justify-content:center}
+.fadein{animation:up .35s ease both}
+.note{font-size:12px;color:var(--t3);line-height:1.5}
+.brand{font:700 44px/1 'Barlow Condensed',sans-serif;letter-spacing:6px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-plan" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></symbol>
+<symbol id="i-dining" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-watch" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 10v2l1 1M16.13 7.66l-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05M7.88 16.36l.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05"/></symbol>
+<symbol id="i-band" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="4"/><path d="M9.5 9.5l1.25 5L12 11l1.25 3.5 1.25-5"/></symbol>
+<symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+<symbol id="i-steps" viewBox="0 0 24 24"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0zM20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0z"/></symbol>
+<symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7M14 21l7-7"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></symbol>
+<symbol id="i-drum" viewBox="0 0 24 24"><path d="M15.4 15.63a7.875 6 135 1 1 6.23-6.23 4.5 3.43 135 0 0-6.23 6.23"/><path d="m8.29 12.71-2.6 2.6a2.5 2.5 0 1 0-1.65 4.65A2.5 2.5 0 1 0 8.7 18.3l2.59-2.59"/></symbol>
+<symbol id="i-bowl" viewBox="0 0 24 24"><path d="M2 12h20a10 10 0 0 1-20 0zM7 12c0-3 2-5 5-5s5 2 5 5"/></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></symbol>
+<symbol id="i-pizza" viewBox="0 0 24 24"><path d="M15 11h.01M11 15h.01M16 16h.01M2 16l20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></symbol>
+<symbol id="i-milk" viewBox="0 0 24 24"><path d="M8 2h8M9 2v2.79a4 4 0 0 1-.67 2.22l-.66.98A4 4 0 0 0 7 10.21V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.79a4 4 0 0 0-.67-2.22l-.66-.98A4 4 0 0 1 15 4.79V2"/><path d="M7 15a6.47 6.47 0 0 1 5 0 6.47 6.47 0 0 0 5 0"/></symbol>
+<symbol id="i-cake" viewBox="0 0 24 24"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1M2 21h20M7 8v3M12 8v3M17 8v3M7 4h.01M12 4h.01M17 4h.01"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2M10 6h4M10 10h4M10 14h4M10 18h4"/></symbol>
+<symbol id="i-coffee" viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 2v2M10 2v2M14 2v2"/></symbol>
+<symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18M9 20v-6h6v6"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7l-8.5 8.5-5-5L2 17M16 7h6v6"/></symbol>
+</svg>
+<div id="app"></div>
+<div id="layer"></div>
+<script>
+/* =========================================================
+   DATA — Swarthmore Dining Center menus, pulled from The Dash
+   (dash.swarthmore.edu, CBORD menu feed) for Sat Nov 14 and
+   Sun Nov 15, 2026. Station names, items and dietary labels
+   are as published. Nutrition is NOT in the feed: NUT below
+   holds Hackro per-serving estimates.
+   ========================================================= */
+const MENU = {
+'sat-b': {
+ 'Field of Greens': "Greek Yogurt ::milk::, Cottage Cheese ::gluten free:: ::milk::, Vanilla Yogurt ::gluten free:: ::milk::, Assorted Fruits, Fruit Salad ::gluten free:: ::vegan::, Grapefruit, Sliced Melon ::vegan::, Hard Boiled Eggs ::egg:: ::gluten free:: ::vegetarian::",
+ 'Free Zone': "Homesfries FreeZone ::gluten free:: ::vegan::, Chicken Sausage ::gluten free::, Bacon ::gluten free:: ::pork::",
+ 'World of Flavor': "Phoenix Sandwich ::egg:: ::milk:: ::vegetarian:: ::wheat::, Scrambled Eggs ::egg:: ::gluten free:: ::vegetarian::, Eggs to Order ::egg:: ::gluten free::, Breakfast Bread ::egg:: ::milk:: ::soy:: ::vegetarian:: ::wheat::, Bacon ::gluten free:: ::pork::, Chicken Sausage ::gluten free::, Vegan Sausage ::soy:: ::vegan:: ::wheat::, Hashbrowns ::gluten free:: ::soy:: ::vegan::",
+ 'The Classics': "Oatmeal ::gluten free:: ::vegan::, Brown Sugar ::gluten free:: ::vegan::, Cinnamon Sugar ::gluten free:: ::vegan::, Craisins ::gluten free:: ::vegan::, Raisins ::gluten free:: ::vegan::, Toasted Almonds ::gluten free:: ::tree nut:: ::vegan::",
+ 'Daily Kneads': "Chocolate Espresso Banana Bread ::soy:: ::vegan:: ::wheat::, Assorted Donuts ::egg:: ::milk:: ::soy:: ::wheat::, Assorted Pastries ::egg:: ::milk:: ::wheat::"
+},
+'sat-l': {
+ 'Fired Up': "Chefs Choice, Oatmeal ::gluten free:: ::vegan::, Cheese Pizza ::milk:: ::vegetarian:: ::wheat::, Pepperoni Pizza ::milk:: ::pork:: ::wheat::",
+ 'Free Zone': "Chocolate Chip Waffles FZ, Berry Compote ::gluten free:: ::vegan::, Cheese Pizza FZ ::gluten free:: ::vegan::, Bacon ::gluten free:: ::pork::, Homesfries FreeZone ::gluten free:: ::vegan::, Pumpkin Spice Overnight Oats ::gluten free:: ::vegan::, Chicken Sausage ::gluten free::",
+ 'World of Flavor': "Phoenix Sandwich ::egg:: ::milk:: ::vegetarian:: ::wheat::, French Toast Sticks ::soy:: ::vegetarian:: ::wheat::, Scrambled Eggs ::egg:: ::gluten free:: ::vegetarian::, Eggs to Order ::egg:: ::gluten free::, Hamburger ::gluten free:: ::halal::, Chicken Sausage ::gluten free::, Vegan Sausage ::soy:: ::vegan:: ::wheat::, Bacon ::gluten free:: ::pork::, Hashbrowns ::gluten free:: ::soy:: ::vegan::, White Rice ::gluten free:: ::vegan::",
+ 'The Classics': "Chicken & Waffles, Chicken Tenders ::egg:: ::milk:: ::wheat::, Waffles ::egg:: ::milk:: ::wheat::, Hot Honey, Honey ::vegetarian::, Mixed Berries ::gluten free:: ::vegan::, Toasted Almonds ::gluten free:: ::tree nut:: ::vegan::, Whipped Cream ::gluten free:: ::milk::, Pimento Grits ::milk:: ::vegetarian::, Vanilla Chia Seed Pudding ::gluten free:: ::vegan::, Roasted Green Beans ::gluten free:: ::vegan::",
+ "Grillin' Out": "Eggs to Order ::egg:: ::gluten free::, French Fries ::gluten free:: ::vegan::, Grilled Chicken Breast ::gluten free:: ::halal::, Cheeseburger ::halal:: ::milk:: ::sesame:: ::soy:: ::wheat::",
+ 'Verdant & Vegan': "Breakfast Totchos, Tater Tots ::gluten free:: ::soy:: ::vegetarian::, Tofu Scramble ::gluten free:: ::soy:: ::vegan::, Avocado ::gluten free:: ::vegan::, Black Beans ::gluten free:: ::vegan::, Jalapeno ::gluten free:: ::vegan::, Salsa ::gluten free:: ::vegan::, Vegan Cheese Sauce ::gluten free:: ::tree nut:: ::vegan::, White Rice ::gluten free:: ::vegan::"
+},
+'sat-d': {
+ 'Free Zone': "Cheese Pizza FZ ::gluten free:: ::vegan::, Lemon Herb Roast Chicken FZ ::halal::, Kidney Beans ::gluten free:: ::vegan::, Roasted Mini Potatoes ::gluten free:: ::vegan::, Roasted Green Beans ::gluten free:: ::vegan::",
+ 'World of Flavor': "Chinese, Bang Bang Chicken ::egg:: ::milk:: ::soy:: ::wheat::, Bang Bang shrimp ::egg:: ::sesame:: ::shellfish:: ::soy:: ::wheat::, White Rice ::gluten free:: ::vegan::, Cucumbers ::gluten free:: ::vegan::, Shredded Carrots ::gluten free:: ::vegan::, Steamed Edamame ::gluten free:: ::soy:: ::vegan::, Napa Cabbage Greens ::gluten free:: ::vegan::, Asian Sesame Dressing ::sesame:: ::soy:: ::wheat::",
+ 'The Classics': "Steak Night, Grilled Beef Chateau Steak ::gluten free:: ::halal::, Roasted Mini Potatoes ::gluten free:: ::vegan::, Chimichuri ::gluten free:: ::vegan::, Asparagus ::vegan::",
+ 'Daily Kneads': "Matcha Cheesecake ::egg:: ::milk:: ::soy:: ::wheat::, Vanilla Pudding ::gluten free:: ::milk:: ::soy::, M & M Blondies ::egg:: ::soy:: ::wheat::, Brownie Cookie Sandwich",
+ 'Fired Up': "Cheese Pizza ::milk:: ::vegetarian:: ::wheat::, Pepperoni Pizza ::milk:: ::pork:: ::wheat::",
+ "Grillin' Out": "Eggs to Order ::egg:: ::gluten free::, French Fries ::gluten free:: ::vegan::, Grilled Chicken Breast ::gluten free:: ::halal::",
+ 'Field of Greens': "Romaine Lettuce ::vegan::"
+},
+'sun-br': {
+ 'Fired Up': "Chefs Choice, Oatmeal ::gluten free:: ::vegan::, Cheese Pizza ::milk:: ::vegetarian:: ::wheat::, Pepperoni Pizza ::milk:: ::pork:: ::wheat::",
+ 'Free Zone': "Vanilla Chia Seed Pudding ::gluten free:: ::vegan::, Blueberries ::gluten free:: ::vegan::, Granola FZ ::vegan::, Homesfries FreeZone ::gluten free:: ::vegan::, Bacon ::gluten free:: ::pork::, Turkey Bacon",
+ 'World of Flavor': "Spanish Brunch, Tortilla Espanola ::egg:: ::gluten free:: ::milk:: ::vegetarian::, Chocolate Chip Croissant Strata ::egg:: ::milk:: ::soy:: ::vegetarian:: ::wheat::, Roasted Tomatoes ::gluten free:: ::vegan::, White Rice ::gluten free:: ::vegan::, Bacon ::gluten free:: ::pork::, Sour Cream ::gluten free:: ::milk:: ::vegetarian::, Whipped Cream ::gluten free:: ::milk::",
+ 'The Classics': "Lemon Herb Roast Chicken ::kosher::, Crispy Potato Wedges ::gluten free:: ::vegan::, Roasted Asparagus ::gluten free:: ::vegan::",
+ 'Verdant & Vegan': "Middle Eastern Breakfast, Vegan Shakshuka ::gluten free:: ::vegan::, Vanilla Chia Seed Pudding ::gluten free:: ::vegan::, Pita Bread ::soy:: ::vegan:: ::wheat::, White Rice ::gluten free:: ::vegan::, Blueberries ::gluten free:: ::vegan::, Toasted Almonds ::gluten free:: ::tree nut:: ::vegan::, Toasted Coconut ::gluten free:: ::tree nut::, Roasted Eggplant ::gluten free:: ::vegan::, Vegan White Chocolate Scone ::soy:: ::wheat::",
+ 'Daily Kneads': "Cheddar & Chive Muffins ::egg:: ::milk:: ::soy:: ::vegetarian:: ::wheat::, Chocolate Chip Scones ::egg:: ::milk:: ::soy:: ::wheat::",
+ 'Field of Greens': "Romaine Lettuce ::vegan::"
+},
+'sun-d': {
+ 'Free Zone': "Chickpea Pasta w Marinara ::vegan::, Roasted Chicken Thighs ::gluten free:: ::halal::, Steamed Broccoli ::gluten free:: ::vegan::, Herb White Beans ::gluten free:: ::vegan::, Garden Salad ::gluten free:: ::vegan::, Pumpkin Muffins FZ",
+ 'World of Flavor': "Ravioli Night, Cheese Ravioli with Alfredo ::egg:: ::milk:: ::soy:: ::vegetarian:: ::wheat::, Cheese Ravioli w/ Marinara ::egg:: ::milk:: ::soy:: ::vegetarian:: ::wheat::, Garlic Roasted Chicken ::gluten free:: ::halal::, Italian Sausage, Red Chili Flakes, Garlic Roasted Broccoli ::gluten free:: ::vegan::, Garlic Bread ::milk:: ::soy:: ::vegetarian:: ::wheat::",
+ 'The Classics': "Grilled Pork Chops ::gluten free:: ::pork::, Wild Mushroom Ragout ::milk:: ::wheat::, Baked Potato ::gluten free:: ::vegan::, Applesauce ::gluten free:: ::vegan::, Biscuits ::egg:: ::milk:: ::soy:: ::vegetarian:: ::wheat::, Whipped Butter ::gluten free:: ::milk:: ::vegetarian::, Green Beans ::gluten free:: ::vegan::",
+ 'Daily Kneads': "Chocolate Chip Blondies ::egg:: ::milk:: ::soy:: ::wheat::, Mint Oreo Cheesecake ::egg:: ::milk:: ::soy:: ::wheat::, Vanilla Pudding ::gluten free:: ::milk:: ::soy::, Mango Lime Cupcakes ::egg:: ::milk:: ::soy:: ::wheat::",
+ 'Verdant & Vegan': "Cavatappi w/ Olive Oil ::soy:: ::vegan:: ::wheat::, Lentil Bolognese ::gluten free:: ::vegan::, Vegan Garlic Alfredo ::gluten free:: ::soy:: ::vegan::",
+ 'Spice of Life': "Beef Shawarma ::gluten free:: ::halal::, Tomato Cucumber Salad ::gluten free:: ::vegan::, White Sauce ::egg:: ::gluten free:: ::milk:: ::vegetarian::, Yellow Rice ::gluten free:: ::vegan::",
+ 'Fired Up': "Cheese Pizza ::milk:: ::vegetarian:: ::wheat::, Pepperoni Pizza ::milk:: ::pork:: ::wheat::",
+ "Grillin' Out": "Eggs to Order ::egg:: ::gluten free::, French Fries ::gluten free:: ::vegan::, Grilled Chicken Breast ::gluten free:: ::halal::",
+ 'Field of Greens': "White Rice ::gluten free:: ::vegan::, Chefs Choice, Romaine Lettuce ::vegan::"
+},
+'sun-5': {
+ 'Field of Greens': "Greek Yogurt ::milk::, Granola ::vegan:: ::wheat::",
+ 'World of Flavor': "The 5th Meal Grill, Grilled Chicken Breast ::gluten free:: ::halal::, Potato Buns ::egg:: ::milk:: ::sesame:: ::soy:: ::vegetarian:: ::wheat::, Lettuce Leaf, Sliced Tomatoes ::vegan::, Sliced Red Onions ::gluten free:: ::vegan::, Crispy Naked Wings ::gluten free::, BBQ Sauce ::gluten free:: ::vegan::, Buffalo Sauce ::gluten free:: ::milk::, Thai Chili Sauce ::gluten free::, French Fries ::gluten free:: ::vegan::, Cheese Sauce ::gluten free:: ::milk:: ::vegetarian::, Sour Cream ::gluten free:: ::milk:: ::vegetarian::, Bacon Bits ::gluten free:: ::pork::, Chopped Scallion",
+ 'Daily Kneads': "Assorted Cookies ::egg:: ::milk:: ::soy:: ::tree nut:: ::wheat::, Chefs Choice",
+ 'Fired Up': "Cheese Pizza ::milk:: ::vegetarian:: ::wheat::, Pepperoni Pizza ::milk:: ::pork:: ::wheat::"
+}
+};
+const THEMES = new Set(['Chefs Choice','Chinese','Steak Night','Chicken & Waffles','Breakfast Totchos','Spanish Brunch','Middle Eastern Breakfast','Ravioli Night','The 5th Meal Grill']);
+
+/* Hackro per-serving estimates: [kcal, protein, carbs, fat, qty, unit, role, flags]
+   role: P protein · X full dish · C carb · V vegetable · F fruit · D dairy/egg side · S sweet · K topping/condiment
+   flags: m = meat or poultry, f = seafood */
+const NUT = {
+'Greek Yogurt':[150,20,8,4,1,'cup','D'],'Cottage Cheese':[110,12,5,5,0.5,'cup','D'],'Vanilla Yogurt':[150,6,25,3,6,'oz','S'],
+'Assorted Fruits':[90,1,23,0,1,'piece','F'],'Fruit Salad':[80,1,20,0,1,'cup','F'],'Grapefruit':[50,1,13,0,0.5,'grapefruit','F'],'Sliced Melon':[55,1,14,0,1,'cup','F'],
+'Hard Boiled Eggs':[140,12,1,10,2,'eggs','D'],'Homesfries FreeZone':[220,3,32,9,1,'cup','C'],'Chicken Sausage':[140,14,2,8,2,'links','P','m'],
+'Bacon':[130,9,0,10,3,'slices','K','m'],'Phoenix Sandwich':[380,18,32,20,1,'sandwich','X'],'Scrambled Eggs':[180,12,2,14,2,'eggs','P'],
+'Eggs to Order':[160,12,1,11,2,'eggs','P'],'Breakfast Bread':[220,4,32,9,1,'slice','C'],'Vegan Sausage':[150,12,8,8,2,'links','P'],
+'Hashbrowns':[200,2,24,11,2,'patties','C'],'Oatmeal':[160,6,28,3,1,'cup','C'],'Brown Sugar':[50,0,13,0,1,'tbsp','K'],'Cinnamon Sugar':[30,0,8,0,2,'tsp','K'],
+'Craisins':[60,0,16,0,2,'tbsp','K'],'Raisins':[60,1,16,0,2,'tbsp','K'],'Toasted Almonds':[100,4,3,9,2,'tbsp','K'],
+'Chocolate Espresso Banana Bread':[260,4,40,10,1,'slice','S'],'Assorted Donuts':[270,3,32,15,1,'donut','S'],'Assorted Pastries':[300,5,34,16,1,'pastry','S'],
+'Cheese Pizza':[285,12,36,10,1,'slice','X'],'Pepperoni Pizza':[315,13,35,13,1,'slice','X','m'],'Chocolate Chip Waffles FZ':[260,4,40,9,1,'waffle','S'],
+'Berry Compote':[60,0,15,0,0.25,'cup','K'],'Cheese Pizza FZ':[270,6,38,10,1,'slice','X'],'Pumpkin Spice Overnight Oats':[280,7,46,7,1,'cup','C'],
+'French Toast Sticks':[320,6,44,13,4,'sticks','C'],'Hamburger':[280,22,0,21,4,'oz','P','m'],'White Rice':[205,4,45,0,1,'cup','C'],
+'Chicken Tenders':[330,22,18,19,3,'tenders','P','m'],'Waffles':[220,6,25,11,1,'waffle','C'],'Hot Honey':[60,0,17,0,1,'tbsp','K'],'Honey':[60,0,17,0,1,'tbsp','K'],
+'Mixed Berries':[70,1,17,0,1,'cup','F'],'Whipped Cream':[30,0,2,3,2,'tbsp','K'],'Pimento Grits':[240,7,30,10,1,'cup','C'],
+'Vanilla Chia Seed Pudding':[180,5,20,9,0.5,'cup','S'],'Roasted Green Beans':[70,2,8,4,1,'cup','V'],'French Fries':[320,4,42,15,1,'serving','C'],
+'Grilled Chicken Breast':[230,43,0,5,5,'oz','P','m'],'Cheeseburger':[540,30,36,30,1,'burger','X','m'],'Tater Tots':[260,3,30,14,10,'tots','C'],
+'Tofu Scramble':[200,18,6,12,1,'cup','P'],'Avocado':[60,1,3,5,0.25,'avocado','K'],'Black Beans':[115,8,20,0,0.5,'cup','C'],'Jalapeno':[5,0,1,0,1,'tbsp','K'],
+'Salsa':[10,0,2,0,2,'tbsp','K'],'Vegan Cheese Sauce':[90,2,6,7,0.25,'cup','K'],'Lemon Herb Roast Chicken FZ':[280,38,1,13,5,'oz','P','m'],
+'Kidney Beans':[110,8,20,0,0.5,'cup','C'],'Roasted Mini Potatoes':[180,3,30,6,1,'cup','C'],'Bang Bang Chicken':[420,26,28,22,1,'cup','P','m'],
+'Bang Bang shrimp':[380,20,28,20,1,'cup','P','f'],'Cucumbers':[15,1,3,0,0.5,'cup','V'],'Shredded Carrots':[25,1,6,0,0.5,'cup','V'],
+'Steamed Edamame':[95,9,7,4,0.5,'cup','D'],'Napa Cabbage Greens':[15,1,3,0,1,'cup','V'],'Asian Sesame Dressing':[120,0,6,10,2,'tbsp','K'],
+'Grilled Beef Chateau Steak':[400,46,0,23,6,'oz','P','m'],'Chimichuri':[70,0,1,7,1,'tbsp','K'],'Asparagus':[40,4,7,0,6,'spears','V'],
+'Matcha Cheesecake':[380,6,34,25,1,'slice','S'],'Vanilla Pudding':[150,3,25,4,0.5,'cup','S'],'M & M Blondies':[250,3,34,12,1,'bar','S'],
+'Brownie Cookie Sandwich':[320,4,44,15,1,'sandwich','S'],'Romaine Lettuce':[15,1,3,0,2,'cups','V'],'Blueberries':[85,1,21,0,1,'cup','F'],
+'Granola FZ':[220,5,32,8,0.5,'cup','C'],'Turkey Bacon':[105,9,1,7,3,'slices','P','m'],'Tortilla Espanola':[240,10,18,14,1,'slice','X'],
+'Chocolate Chip Croissant Strata':[420,10,46,22,1,'square','S'],'Roasted Tomatoes':[40,1,6,2,0.5,'cup','V'],'Sour Cream':[60,1,1,6,2,'tbsp','K'],
+'Lemon Herb Roast Chicken':[280,38,1,13,5,'oz','P','m'],'Crispy Potato Wedges':[240,4,32,11,1,'cup','C'],'Roasted Asparagus':[50,4,7,2,6,'spears','V'],
+'Vegan Shakshuka':[200,8,24,8,1,'cup','X'],'Pita Bread':[165,5,33,1,1,'pita','C'],'Toasted Coconut':[70,1,3,6,2,'tbsp','K'],
+'Roasted Eggplant':[90,1,10,5,1,'cup','V'],'Vegan White Chocolate Scone':[380,5,52,17,1,'scone','S'],'Cheddar & Chive Muffins':[280,8,30,14,1,'muffin','C'],
+'Chocolate Chip Scones':[420,6,56,19,1,'scone','S'],'Chickpea Pasta w Marinara':[380,20,56,8,1.5,'cups','X'],'Roasted Chicken Thighs':[300,32,0,19,5,'oz','P','m'],
+'Steamed Broccoli':[55,4,11,0,1,'cup','V'],'Herb White Beans':[130,8,22,1,0.5,'cup','C'],'Garden Salad':[30,2,6,0,1.5,'cups','V'],
+'Pumpkin Muffins FZ':[260,3,40,10,1,'muffin','S'],'Cheese Ravioli with Alfredo':[480,18,40,28,1,'cup','X'],'Cheese Ravioli w/ Marinara':[340,15,44,11,1,'cup','X'],
+'Garlic Roasted Chicken':[260,40,2,10,5,'oz','P','m'],'Italian Sausage':[280,14,3,24,1,'link','P','m'],'Red Chili Flakes':[0,0,0,0,1,'pinch','K'],
+'Garlic Roasted Broccoli':[90,4,11,4,1,'cup','V'],'Garlic Bread':[170,4,20,8,1,'slice','C'],'Grilled Pork Chops':[330,42,0,17,6,'oz','P','m'],
+'Wild Mushroom Ragout':[120,3,10,8,0.5,'cup','K'],'Baked Potato':[160,4,37,0,1,'potato','C'],'Applesauce':[50,0,13,0,0.5,'cup','F'],
+'Biscuits':[210,4,26,10,1,'biscuit','C'],'Whipped Butter':[70,0,0,8,1,'tbsp','K'],'Green Beans':[45,2,9,0,1,'cup','V'],
+'Chocolate Chip Blondies':[250,3,34,12,1,'bar','S'],'Mint Oreo Cheesecake':[400,6,40,24,1,'slice','S'],'Mango Lime Cupcakes':[300,3,44,13,1,'cupcake','S'],
+'Cavatappi w/ Olive Oil':[360,11,62,8,1.5,'cups','C'],'Lentil Bolognese':[230,15,34,3,1,'cup','P'],'Vegan Garlic Alfredo':[120,3,8,9,0.25,'cup','K'],
+'Beef Shawarma':[330,34,4,20,5,'oz','P','m'],'Tomato Cucumber Salad':[45,1,9,1,1,'cup','V'],'White Sauce':[80,0,1,8,2,'tbsp','K'],
+'Yellow Rice':[220,4,46,2,1,'cup','C'],'Granola':[220,5,32,8,0.5,'cup','C'],'Potato Buns':[140,4,26,2,1,'bun','C'],'Lettuce Leaf':[5,0,1,0,1,'leaf','K'],
+'Sliced Tomatoes':[10,0,2,0,2,'slices','K'],'Sliced Red Onions':[10,0,2,0,2,'tbsp','K'],'Crispy Naked Wings':[430,38,0,30,6,'wings','P','m'],
+'BBQ Sauce':[60,0,14,0,2,'tbsp','K'],'Buffalo Sauce':[20,0,1,2,2,'tbsp','K'],'Thai Chili Sauce':[80,0,20,0,2,'tbsp','K'],'Cheese Sauce':[90,3,4,7,0.25,'cup','K'],
+'Bacon Bits':[50,4,0,4,1,'tbsp','K','m'],'Chopped Scallion':[2,0,0,0,1,'tbsp','K'],'Assorted Cookies':[200,2,28,9,1,'cookie','S']
+};
+
+const MEALS = [
+ {id:'sat-b', day:'sat', name:'Breakfast', time:'7:00', start:420, end:660, hours:'7–11 AM', share:.26, kind:'breakfast'},
+ {id:'sat-l', day:'sat', name:'Lunch', time:'11:00', start:660, end:840, hours:'11 AM–2 PM', share:.32, kind:'meal'},
+ {id:'sat-s', day:'sat', name:'Snack', time:'15:30', start:930, end:960, hours:'Take it to go at breakfast', share:.10, kind:'snack', from:'sat-b', stations:['Field of Greens'], opt:'snack'},
+ {id:'sat-d', day:'sat', name:'Dinner', time:'18:00', start:960, end:1200, hours:'4–8 PM', share:.32, kind:'meal'},
+ {id:'sun-br', day:'sun', name:'Brunch', time:'10:00', start:600, end:840, hours:'10 AM–2 PM', share:.40, kind:'breakfast'},
+ {id:'sun-d', day:'sun', name:'Dinner', time:'17:30', start:960, end:1200, hours:'4–8 PM', share:.40, kind:'meal'},
+ {id:'sun-5', day:'sun', name:'5th Meal', time:'20:00', start:1200, end:1260, hours:'8–9 PM', share:.20, kind:'meal', opt:'fifth'}
+];
+const DAYS = {sat:{label:'Sat, Nov 14', short:'Sat'}, sun:{label:'Sun, Nov 15', short:'Sun'}};
+const NOW = {day:'sat', mins:9*60+40, label:'9:40 AM'};
+const VENUES = [
+ {name:'Science Center Coffee Bar', icon:'i-coffee', status:'Open until midnight', open:true, d:'Coffee, sandwiches, salads, soup, sushi · late-night swipe 7–11 PM weekends'},
+ {name:"Essie's Corner", icon:'i-store', status:'Closed weekends · Mon 8:30 AM', open:false, d:'Made-to-order sandwiches and grain bowls'},
+ {name:'Kohlberg Coffee Bar', icon:'i-coffee', status:'Closed weekends · Mon 8 AM', open:false, d:'Coffee, pastries, soups, sandwiches'},
+ {name:'The Crumb Café', icon:'i-store', status:'Hours not posted', open:false, d:'Student-run late night'}
+];
+/* Goal keys match the backend Goal type: "build" | "cut" | "maintain" | "perform". */
+const GOALS = {
+ build:{label:'Build', d:'Add muscle while keeping fat gain slow', adj:350, pk:2.0},
+ cut:{label:'Cut', d:'Lose fat, keep the muscle you have', adj:-450, pk:2.2},
+ maintain:{label:'Maintain', d:'Hold your weight and eat well', adj:0, pk:1.6},
+ perform:{label:'Perform', d:'Fuel training, games and recovery', adj:150, pk:1.8}
+};
+const ALLERGENS = [['milk','Milk'],['egg','Egg'],['wheat','Wheat'],['gluten','Gluten'],['soy','Soy'],['tree nut','Tree nuts'],['peanut','Peanuts'],['sesame','Sesame'],['shellfish','Shellfish'],['fish','Fish']];
+const MAJOR = ['milk','egg','wheat','soy','tree nut','peanut','sesame','shellfish','fish'];
+/* The profile keeps ONE flat `restrictions` array (mirrors backend ProfileInput.restrictions):
+   it holds an optional diet value, zero or more allergen keys, and an optional free-text
+   "other" allergy. These accessors read each part back out of that single array.
+   "omnivore" is the absence of a diet value, so it is never stored. */
+const DIET_VALUES = new Set(['vegetarian', 'vegan', 'pescatarian']);
+const ALLERGEN_KEYS = new Set(ALLERGENS.map(a => a[0]));
+const dietOf = p => (p.restrictions || []).find(r => DIET_VALUES.has(r)) || 'omnivore';
+const allergiesOf = p => (p.restrictions || []).filter(r => ALLERGEN_KEYS.has(r));
+const otherOf = p => (p.restrictions || []).find(r => !DIET_VALUES.has(r) && !ALLERGEN_KEYS.has(r)) || '';
+/* Replace the single free-text "other" allergy in a profile's restrictions. */
+function setOtherRestriction(p, text){
+ const t = String(text || '').trim();
+ p.restrictions = (p.restrictions || []).filter(r => DIET_VALUES.has(r) || ALLERGEN_KEYS.has(r));
+ if (t) p.restrictions.push(t);
+}
+const XC = 'Allergen info comes from Dining Services. Cross-contact is possible, so confirm with staff.';
+const xcNote = (st = '') => `<p class="note" style="margin:0;${st}">${XC}</p>`;
+const aName = a => (ALLERGENS.find(x => x[0] === a) || [a, a])[1].toLowerCase();
+/* Typical allergens for foods logged outside the Dining Center (Hackro estimates from the food's name) */
+const AGUESS = [['peanut',/peanut|\bpb\b|pbj|pb&j|trail mix|snickers|candy bar|pad thai|satay/],['tree nut',/almond|cashew|walnut|pecan|trail mix|nutella|pesto|\bnuts\b/],['milk',/milk|cheese|latte|cappuccino|yogurt|parfait|ice cream|alfredo|quesadilla|nachos|cream|whey|protein shake|protein bar|chai|cocoa|hot chocolate|pizza|\bmac\b|butter|smoothie|muffin|croissant|pancake|waffle|donut|brownie|cookie|cheesesteak|caesar/],['egg',/\begg|mayo|pancake|waffle|muffin|brownie|cookie|donut|french toast|croissant|caesar/],['wheat',/bread|bagel|sandwich|hoagie|\bsub\b|pizza|pasta|spaghetti|fettuccine|burger|\bbun|wrap|tortilla|burrito|quesadilla|taco|muffin|donut|croissant|pancake|waffle|cereal|granola|pretzel|cookie|brownie|ramen|noodle|dumpling|potsticker|cracker|toast|pita|gyro|tender|mozzarella stick|cheesesteak|clif|protein bar|\bmac\b|orange chicken|blt|pb&j|pbj|caesar/],['soy',/\bsoy|tofu|edamame|sushi|fried rice|orange chicken|dumpling|ramen|pad thai|protein bar|clif|teriyaki|poke/],['sesame',/sesame|tahini|hummus|sushi|poke|bagel/],['fish',/salmon|tuna|\bfish|sushi|poke|caesar/],['shellfish',/shrimp|crab|lobster|california roll/]];
+const guessAllergens = t => AGUESS.filter(([a, re]) => re.test(String(t).toLowerCase())).map(a => a[0]);
+/* Does a list of allergens (from labels or estimates) hit the user's allergies? Returns readable names or [] */
+function userHits(list, name = '', p = S.p){
+ const al = allergiesOf(p); const out = []; const other = otherOf(p);
+ for (const a of al) { if (a === 'gluten' ? list.includes('wheat') : list.includes(a)) out.push(aName(a)); }
+ if (other && name && String(name).toLowerCase().includes(other.toLowerCase().trim())) out.push(other.toLowerCase().trim());
+ return out;
+}
+/* What Dining Services labeled for a menu item */
+function allergenState(it){
+ const contains = MAJOR.filter(a => it.tags.has(a));
+ if (contains.length) return {state:'contains', list:contains};
+ if (it.tags.size || it.station === 'Free Zone' || /FZ$|FreeZone/.test(it.name)) return {state:'none', list:[]};
+ return {state:'nodata', list:[]};
+}
+const DEVICES = [
+ {id:'whoop', name:'Whoop', icon:'i-band', d:'Strain and recovery'}
+];
+const PERMS = [
+ ['recovery','i-bolt','Strain and recovery','Builds your Fuel Score, adds calories on hard days']
+];
+const ALLPERMS = () => Object.fromEntries(PERMS.map(x => [x[0], true]));
+const REWARDS = [
+ [1, 'First Fuel', 'Badge for your first on-target day', 'i-flame'],
+ [3, 'Streak freeze', 'Miss one day without losing your streak', 'i-shield'],
+ [7, 'Garnet rings', 'A garnet theme for your Today rings', 'i-target'],
+ [30, 'Fuel Legend', 'Top-tier badge on your profile', 'i-bolt']
+];
+const QUICK = [['Banana',105,1,27,0],['Protein bar',210,20,23,7],['Protein shake, 1 scoop',120,24,3,1],['Iced latte, 16 oz',190,12,18,7],['Fruit smoothie, 16 oz',300,8,58,4],['Trail mix, ¼ cup',175,5,16,11],['Chips, 1 oz bag',150,2,15,10],['Peanut butter toast',280,10,30,14],['Pizza slice, off campus',300,12,36,11]];
+/* Custom-food macros are looked up live from USDA FoodData Central (/api/nutrition) —
+   see fetchCustomNutrition() below. No hardcoded food table. */
+const NUMW = {a:1, an:1, one:1, two:2, three:3, four:4, five:5, half:.5, '½':.5};
+function parseQty(raw){
+ let q = String(raw || '').toLowerCase().trim(); let n = 1;
+ const m = q.match(/^(\d+(?:\.\d+)?|½|a|an|one|two|three|four|five|half)\b\s*(?:x\s+)?/);
+ if (m) { n = isNaN(+m[1]) ? NUMW[m[1]] : +m[1]; q = q.slice(m[0].length); }
+ const m2 = q.match(/\s*x\s*(\d+(?:\.\d+)?)$/); if (m2) { n *= +m2[1]; q = q.slice(0, m2.index); }
+ return {n: Math.max(0.5, Math.min(10, n || 1)), q: q.replace(/\b(of|the|some|my|with|w\/|and)\b/g, ' ').replace(/\s+/g, ' ').trim()};
+}
+/* ---- Custom food: macros come from USDA FoodData Central via /api/nutrition
+   (per 100g), scaled by the gram amount. Nothing is hardcoded. ---- */
+let CUSTOM_T = null;
+/* Recompute the editable macro fields from the per-100g lookup × grams. */
+function recomputeCustom(){
+ const c = S.sheet && S.sheet.c; if (!c || c.manual || !c.per100) return;
+ const g = (+c.grams || 100) / 100;
+ c.k = Math.round(c.per100.k * g); c.p = Math.round(c.per100.p * g);
+ c.c = Math.round(c.per100.c * g); c.f = Math.round(c.per100.f * g);
+}
+/* Look up a food's per-100g macros from the calorie API (USDA FoodData Central). */
+async function fetchCustomNutrition(name){
+ const c = S.sheet && S.sheet.c; if (!c) return;
+ const query = parseQty(name).q || name;
+ const reqId = (c.reqId = (c.reqId || 0) + 1);
+ c.loading = true; c.searched = false; updateCustomDom();
+ const stale = () => !S.sheet || S.sheet.c !== c || c.reqId !== reqId;
+ try {
+  const r = await jget('/api/nutrition?name=' + encodeURIComponent(query));
+  if (stale()) return;
+  const nu = r && r.nutrition;
+  if (nu && nu.calories > 0) { c.per100 = {k: nu.calories, p: nu.protein, c: nu.carbs, f: nu.fat}; c.match = nu.match || query; c.manual = false; recomputeCustom(); }
+  else { c.per100 = null; c.match = ''; }
+ } catch (e) { if (stale()) return; c.per100 = null; c.match = ''; }
+ finally { if (!stale()) { c.loading = false; c.searched = true; updateCustomDom(); } }
+}
+function customSug(){
+ const c = S.sheet.c; if (!c || !c.name) return '';
+ if (c.loading) return `<div class="row" style="gap:8px;color:var(--t2);font-size:13px">${ic('i-refresh','width:16px;height:16px')}<span>Looking up “${esc(parseQty(c.name).q || c.name)}” in USDA FoodData Central…</span></div>`;
+ if (c.per100 && c.match) return `<div class="in row" style="padding:12px 14px;gap:10px;align-items:flex-start">${ic('i-check','color:var(--green);margin-top:1px')}<div style="font-size:13px;line-height:1.4"><span style="display:block;font-weight:600">USDA · ${esc(c.match)}</span><span class="t2">${c.per100.k} kcal · ${c.per100.p}g protein per 100g</span></div></div>`;
+ if (c.searched) return `<p class="note" style="margin:0">No USDA match — enter the numbers from the label below.</p>`;
+ return '';
+}
+function updateCustomDom(){
+ const c = S.sheet.c; const el = id => document.getElementById(id);
+ if (el('cSug')) el('cSug').innerHTML = customSug();
+ for (const k of ['k','p','c','f']) if (el('c_' + k)) el('c_' + k).value = c[k] ?? '';
+ if (el('cGram')) el('cGram').textContent = (+c.grams || 100) + ' g';
+ if (el('cAdd')) el('cAdd').disabled = !(c.name && +c.k);
+}
+const WEAR = {strain:14.2, recovery:88};
+
+/* ========================= STATE ========================= */
+const DEFAULT = () => ({
+ view:'login', step:0, gen:0, profileId:null,
+ p:{name:'', email:'', goal:null, sex:null, age:'', ft:'', inch:'', lb:'', days:null, sport:null, restrictions:[], dietPicked:false, allergySet:false, otherOn:false, halal:false, plan:'swat', snack:true, fifth:true, never:[]},
+ device:null, whoop:null, perms:ALLPERMS(), seed:{}, swaps:{}, itemSwaps:{}, ate:{}, done:{}, locked:{}, flex:{}, extras:[], tab:'today', stack:[], planDay:'sat', dineMeal:'sat-b', dineFilter:null, dineFits:true, sheet:null
+});
+let S;
+try { S = JSON.parse(localStorage.getItem('hackro-demo-v9')) || DEFAULT(); } catch(e) { S = DEFAULT(); }
+S.sheet = null;
+if (S.view === 'gen') S.view = 'reveal';
+function save(){ try { const c = {...S, sheet:null}; localStorage.setItem('hackro-demo-v9', JSON.stringify(c)); } catch(e){} }
+
+/* ========================= HELPERS ========================= */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const ic = (id, st='') => `<svg class="i" ${st?`style="${st}"`:''} aria-hidden="true"><use href="#${id}"/></svg>`;
+const mealById = id => MEALS.find(m => m.id === id);
+const clock = t => { const [h,m] = t.split(':').map(Number); const hh = ((h+11)%12)+1; return `${hh}:${String(m).padStart(2,'0')}`; };
+const ampm = t => +t.split(':')[0] >= 12 ? 'PM' : 'AM';
+
+function parse(str, station){
+ return str.split(', ').map(x => {
+  const tags = new Set([...x.matchAll(/::([^:]+)::/g)].map(m => m[1]));
+  const name = x.replace(/::[^:]+::/g,'').trim();
+  return {name, tags, station, nut: NUT[name] || null, theme: THEMES.has(name)};
+ }).filter(i => i.name);
+}
+const CACHE = {};
+function menuFor(mealId){
+ if (CACHE[mealId]) return CACHE[mealId];
+ const m = mealById(mealId); const src = m.from || mealId;
+ const out = [];
+ for (const [st, str] of Object.entries(MENU[src])) {
+  if (m.stations && !m.stations.includes(st)) continue;
+  out.push({station: st, items: parse(str, st)});
+ }
+ return CACHE[mealId] = out;
+}
+function itemsFor(mealId){
+ const seen = new Map();
+ for (const s of menuFor(mealId)) for (const it of s.items) if (it.nut && !seen.has(it.name)) seen.set(it.name, it);
+ return [...seen.values()];
+}
+function findItem(name, mealId){
+ for (const s of menuFor(mealId)) for (const it of s.items) if (it.name === name) return it;
+ return null;
+}
+function stationsOf(name, mealId){ return menuFor(mealId).filter(s => s.items.some(i => i.name === name)).map(s => s.station); }
+
+/* Which rule an item breaks, or null if it fits the user */
+function conflict(it, p = S.p){
+ const n = it.nut; const fl = (n && n[7]) || ''; const role = n ? n[6] : '';
+ const al = allergiesOf(p); const diet = dietOf(p); const st = allergenState(it);
+ if ((p.never || []).includes(it.name)) return 'On your never-again list';
+ const hits = userHits(st.list, it.name, p); if (hits.length) return `Contains ${hits.join(', ')}`;
+ if (al.includes('gluten') && st.state === 'none' && !it.tags.has('gluten free') && it.station !== 'Free Zone' && !/FZ$|FreeZone/.test(it.name)) return 'Not labeled gluten-free';
+ if (al.includes('fish') && fl.includes('f') && !it.tags.has('shellfish')) return 'Contains fish';
+ if ((al.length || otherOf(p)) && st.state === 'nodata') return 'No allergen data';
+ if (diet === 'vegan') {
+  const implicit = ['F','V'].includes(role) && !fl;
+  if (!(it.tags.has('vegan') || implicit)) return 'Not vegan';
+ }
+ if (diet === 'vegetarian' && (fl.includes('m') || fl.includes('f') || it.tags.has('pork') || it.tags.has('shellfish'))) return 'Not vegetarian';
+ if (diet === 'pescatarian' && (fl.includes('m') || it.tags.has('pork'))) return 'Not pescatarian';
+ if (p.halal) {
+  if (it.tags.has('pork')) return 'Contains pork';
+  if (fl.includes('m') && !it.tags.has('halal')) return 'Not labeled halal';
+ }
+ return null;
+}
+const fits = it => !conflict(it);
+
+const AF = [[1, 1.375, 'lightly active — walking campus'], [3, 1.465, 'moderately active'], [5, 1.55, 'active'], [7, 1.725, 'very active']];
+const SURPLUS = {build:350, perform:150, maintain:0};
+function targets(p = S.p, device = S.device){
+ const kg = p.lb * 0.4536, cm = (p.ft*12 + (+p.inch)) * 2.54;
+ const bmr = 10*kg + 6.25*cm - 5*p.age + (p.sex === 'male' ? 5 : -161);
+ const row = AF.find(r => p.days <= r[0]) || AF[3]; const af = row[1];
+ const tdee = bmr * af; const g = GOALS[p.goal];
+ let adj, adjNote;
+ if (p.goal === 'cut') { const d = Math.min(0.2 * tdee, 500); adj = -d; adjNote = d >= 500 ? 'deficit capped at 500 kcal' : '20% of maintenance'; }
+ else { const want = SURPLUS[p.goal] || 0; adj = Math.min(want, 0.15 * tdee); adjNote = want ? (adj < want ? 'surplus capped at 15% of maintenance' : 'surplus') : 'no change'; }
+ const floor = Math.max(bmr, p.sex === 'female' ? 1200 : 1500);
+ let base = tdee + adj; const floored = base < floor; if (floored) base = floor;
+ base = Math.round(base / 10) * 10;
+ const dev = device && S.perms && S.perms.recovery ? 150 : 0;
+ const kcal = base + dev;
+ const pr = Math.round(kg * g.pk); const f = Math.round(base * 0.27 / 9); const c = Math.round((kcal - pr*4 - f*9) / 4);
+ return {bmr:Math.round(bmr), af, afLabel:row[2], tdee:Math.round(tdee/10)*10, adj:Math.round(adj), adjNote, floor:Math.round(floor), floored, base, dev, kcal, p:pr, c, f, kg};
+}
+
+function mealsOfDay(day){
+ return MEALS.filter(m => m.day === day && (!m.opt || S.p[m.opt]));
+}
+function shareOf(m){
+ const ms = mealsOfDay(m.day); const tot = ms.reduce((a, x) => a + x.share, 0);
+ return m.share / tot;
+}
+function hash(s){ let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; }
+function sumParts(parts){
+ const t = {k:0,p:0,c:0,f:0};
+ for (const x of parts) { const n = x.it.nut; t.k += n[0]*x.m; t.p += n[1]*x.m; t.c += n[2]*x.m; t.f += n[3]*x.m; }
+ return t;
+}
+function rank(mealId, tgt, seed = 0){
+ const m = mealById(mealId); const its = itemsFor(mealId).filter(fits);
+ const by = (...r) => its.filter(i => r.includes(i.nut[6]));
+ let mains, carbs, sides, extras;
+ if (m.kind === 'snack') { mains = by('D'); carbs = [null]; sides = by('F'); extras = [null]; }
+ else {
+  mains = by('P','X'); carbs = by('C'); sides = m.kind === 'breakfast' ? [...by('F'), ...by('V')] : [...by('V'), ...by('F')];
+  extras = [null, ...by('D')];
+ }
+ if (!mains.length && m.kind !== 'snack') mains = by('C');
+ if (!mains.length) return [];
+ if (!sides.length) sides = [null];
+ const VOL = new Set(['cup','cups','oz','tbsp','tsp','serving']);
+ const BK = new Set(['Oatmeal','Pumpkin Spice Overnight Oats','Granola FZ','Granola','French Toast Sticks','Waffles','Breakfast Bread','Chocolate Chip Waffles FZ']);
+ const mults = (it, list) => list.filter(k => VOL.has(it.nut[5]) || Number.isInteger(it.nut[4] * k));
+ const out = [];
+ for (const main of mains) {
+  const isX = main.nut[6] === 'X';
+  const mm = mults(main, isX ? (main.nut[5] === 'slice' ? [1,2,3] : [1,1.5,2]) : [1,1.5,2,2.5]);
+  const cs = isX ? [null, ...carbs] : (carbs.length ? carbs : [null]);
+  for (const a of mm) for (const c of cs) {
+   if (c && c.name === main.name) continue;
+   const cms = c ? mults(c, [0.5,1,1.5,2]) : [0];
+   for (const b of cms) for (const sd of sides) for (const ex of extras) {
+    if (ex && ex.name === main.name) continue;
+    const parts = [{it:main, m:a}];
+    if (c) parts.push({it:c, m:b});
+    if (sd) parts.push({it:sd, m:1});
+    if (ex) parts.push({it:ex, m:1});
+    const t = sumParts(parts);
+    let err = Math.abs(t.k - tgt.k)/tgt.k + 1.6*Math.max(0, tgt.p - t.p)/tgt.p + 0.5*Math.max(0, t.p - tgt.p*1.35)/tgt.p;
+    if (c && c.nut[6]==='C' && main.nut[6]==='X' && b > 1) err += .05;
+    if (c && m.kind === 'meal' && BK.has(c.name)) err += .15;
+    if (seed) err += hash(main.name + (c ? c.name : '') + seed) * 0.35;
+    out.push({parts, t, err, main:main.name});
+   }
+  }
+ }
+ out.sort((x, y) => x.err - y.err);
+ const best = []; const used = new Set();
+ for (const o of out) { if (used.has(o.main)) continue; used.add(o.main); best.push(o); if (best.length >= 6) break; }
+ return best;
+}
+const RANK = {};
+/* ---- Whole-day solver: nudges portions (in real serving steps) until the day lands within ±3% of the kcal
+   target with protein ≥ target, or reports the closest the menu allows. Also re-solves the rest of the day
+   from what was actually eaten. ---- */
+function stepOf(it){ return VOLU.has(it.nut[5]) ? 0.5 : 1 / it.nut[4]; }
+function boundsOf(pp){
+ const r = pp.it.nut[6]; const s = stepOf(pp.it); const pk = pp.pick || pp.m || s;
+ if (pp.user) return [pp.m, pp.m];
+ const min = ['P','X','D'].includes(r) ? Math.max(s, Math.round(pk*0.5/s)*s) : 0;
+ let max = Math.max(pk*2, s*2); max = Math.min(max, Math.max(pk, Math.floor(650 / pp.it.nut[0] / s) * s)); if (/egg/i.test(pp.it.name)) max = Math.min(max, 4 / pp.it.nut[4]);
+ if (['K','S'].includes(r)) max = Math.max(pk, s);
+ if (['V','F'].includes(r)) max = Math.max(pk*2, s);
+ return [min, Math.max(min, max)];
+}
+function balance(parts, T, fixed, mtg){
+ const tot = () => { const t = sumParts(parts); t.k += fixed.k; t.p += fixed.p; t.c += fixed.c; t.f += fixed.f; return t; };
+ const hi = T.kcal * 1.03, lo = T.kcal * 0.97;
+ let MK = new Map();
+ const cand = (pp, dir) => { const s = stepOf(pp.it), [mn, mx] = boundsOf(pp); const nm = +(pp.m + dir*s).toFixed(4); if (nm < mn - 1e-6 || nm > mx + 1e-6) return null; const dk = pp.it.nut[0]*s*dir;
+  if (mtg && dir < 0 && pp._x && mtg.has(pp._x) && (MK.get(pp._x) || 0) + dk < 0.6 * mtg.get(pp._x)) return null;
+  return {pp, nm, dk, dp: pp.it.nut[1]*s*dir}; };
+ const mealGap = () => { const g = new Map(); if (!mtg) return g; for (const [x, tg] of mtg) g.set(x, sumParts(x.parts).k - tg); return g; };
+ const byMeal = (list, sign) => { if (!mtg || !list.length) return list; const g = mealGap(); let best = null, bv = -Infinity; for (const c of list) { const v = sign * (g.get(c.pp._x) || 0); if (v > bv) { bv = v; best = c.pp._x; } } const sub = list.filter(c => c.pp._x === best); return sub.length ? sub : list; };
+ for (let i = 0; i < 500; i++) {
+  const t = tot(); let mv = null;
+  if (mtg) { MK = new Map(); for (const [x] of mtg) MK.set(x, sumParts(x.parts).k); }
+  const ups = parts.map(pp => cand(pp, 1)).filter(Boolean), downs = parts.map(pp => cand(pp, -1)).filter(Boolean);
+  if (t.k > hi) {
+   const ok = downs.filter(d => t.p >= T.p ? t.p + d.dp >= T.p - 1e-6 : (-d.dp / -d.dk) < 0.05);
+   mv = byMeal(ok.length ? ok : downs, 1).sort((a, b) => (a.dp/a.dk) - (b.dp/b.dk))[0] || null;
+  } else if (t.p < T.p - 0.5) {
+   const pu = ups.filter(u => u.dp > 0 && u.dp / u.dk >= 0.06).sort((a, b) => (b.dp/b.dk) - (a.dp/a.dk));
+   const fitsIn = byMeal(pu.filter(u => t.k + u.dk <= hi), -1).sort((a, b) => (b.dp/b.dk) - (a.dp/a.dk))[0];
+   if (fitsIn) mv = fitsIn;
+   else if (pu.length) { const room = byMeal(downs.filter(d => (d.dp/d.dk) < (pu[0].dp/pu[0].dk) * 0.5), 1).sort((a, b) => (a.dp/a.dk) - (b.dp/b.dk))[0]; if (room) mv = room; }
+  }
+  if (!mv && t.k < lo) {
+   const pref = r => ({C:0, X:1, F:2, P:3, D:3, V:4}[r] ?? 5);
+   mv = byMeal(ups.filter(u => t.k + u.dk <= hi + 20), -1).sort((a, b) => pref(a.pp.it.nut[6]) - pref(b.pp.it.nut[6]) || a.pp.m - b.pp.m)[0] || null;
+  }
+  if (!mv) break;
+  mv.pp.m = mv.nm;
+ }
+ return tot();
+}
+/* If portions alone can't reach the target, add up to 3 more dishes from the same meal's menu */
+const BKC = new Set(['Oatmeal','Pumpkin Spice Overnight Oats','Granola FZ','Granola','French Toast Sticks','Waffles','Breakfast Bread','Chocolate Chip Waffles FZ']);
+function augment(meals, T, fixed, canAdj, flagAdded){
+ let t;
+ for (let i = 0; i < 4; i++) {
+  const ups = meals.filter(canAdj); if (!ups.length) return null;
+  const shareSum = ups.reduce((a, x) => a + (x.tgt ? x.tgt.k : 1), 0); const budget = Math.max(0, T.kcal - fixed.k);
+  const mtg = new Map(ups.map(x => [x, budget * (x.tgt ? x.tgt.k : 1) / shareSum]));
+  ups.forEach(x => x.parts.forEach(pp => { pp._x = x; }));
+  t = balance(ups.flatMap(x => x.parts), T, fixed, mtg);
+  const kShort = t.k < T.kcal * 0.97, pShort = t.p < T.p - 0.5;
+  if ((!kShort && !pShort) || i === 3) break;
+  const used = new Set(meals.flatMap(x => x.parts.map(pp => pp.it.name)));
+  let best = null;
+  for (const x of ups) { if (x.m.kind === 'snack') continue;
+   for (const it of itemsFor(x.m.id)) {
+    if (!fits(it) || used.has(it.name)) continue; const r = it.nut[6]; const n = it.nut;
+    if (!['P','C','X','D'].includes(r) || (x.m.kind === 'meal' && BKC.has(it.name))) continue;
+    if (meals.reduce((a, y) => a + y.parts.filter(pp => famOf(pp.it.name) === famOf(it.name)).length, 0) >= (famOf(it.name) === 'egg' ? 1 : 2)) continue;
+    const dens = n[1] / Math.max(n[0], 1); const score = pShort ? dens : (r === 'C' ? 2 : 1) + dens;
+    if (!best || score > best.score) best = {x, it, score};
+   } }
+  if (!best) break;
+  best.x.parts.push({it: best.it, m: 1, pick: 1, orig: 0, added: !!flagAdded});
+ }
+ return t;
+}
+const BASE = {};
+function baseline(day){
+ const T = targets();
+ const key = JSON.stringify([day, S.p, has('recovery'), S.seed]);
+ if (!RANK[key]) {
+  const ok = mealsOfDay(day).filter(m => rank(m.id, {k:500, p:30}).length);
+  const tot = ok.reduce((a, m) => a + m.share, 0);
+  RANK[key] = ok.map(m => { const sh = m.share / tot; const tgt = {k: T.kcal*sh, p: T.p*sh}; return {m, tgt, ranked: rank(m.id, tgt, S.seed[m.id] || 0)}; });
+ }
+ const bkey = key + JSON.stringify([S.swaps, S.itemSwaps, S.adds || {}]);
+ if (!BASE[bkey]) {
+  const meals = applySwaps(RANK[key]).map(x => ({...x, parts: x.parts.map(pp => ({...pp, pick: pp.m}))}));
+  augment(meals, T, {k:0, p:0, c:0, f:0}, () => true, false);
+  BASE[bkey] = meals.map(x => { const parts = x.parts.filter(pp => pp.m > 0).map(pp => ({...pp, orig: pp.m, added: false})); return {...x, parts, tot: sumParts(parts), baseTot: sumParts(parts)}; }).filter(x => x.parts.length);
+ }
+ return BASE[bkey].map(x => ({...x, parts: x.parts.map(pp => ({...pp}))}));
+}
+function plan(day){
+ const meals = baseline(day);
+ return day === NOW.day ? rebalance(meals) : meals;
+}
+function dayProjection(){
+ const pl = plan(NOW.day); const T = targets(); const t = eatenFixed(pl.map(x => x));
+ for (const x of pl) if (isUp(x)) { t.k += x.tot.k; t.p += x.tot.p; }
+ const dk = t.k - T.kcal; const msgs = [];
+ if (Math.abs(dk) > T.kcal * 0.05) msgs.push(`${dk > 0 ? '+' : '−'}${fmt(Math.abs(dk))} kcal ${dk > 0 ? 'over' : 'under'} target`);
+ if (t.p < T.p - 0.5) msgs.push(`${Math.round(T.p - t.p)} g protein short`);
+ return {t, msg: msgs.length ? `Closest today's menu allows: ${msgs.join(', ')}.` : ''};
+}
+function planStatus(day){
+ const T = targets(); const pl = baseline(day); const t = {k:0, p:0}; pl.forEach(x => { t.k += x.tot.k; t.p += x.tot.p; });
+ const dk = t.k - T.kcal; const msgs = [];
+ if (Math.abs(dk) > T.kcal * 0.05) msgs.push(`${dk > 0 ? '+' : '−'}${fmt(Math.abs(dk))} kcal ${dk > 0 ? 'over' : 'under'} target`);
+ if (t.p < T.p - 0.5) msgs.push(`${Math.round(T.p - t.p)} g protein short`);
+ return {t, T, dk, ok: !msgs.length, msg: msgs.length ? `Closest today's menu allows: ${msgs.join(', ')}.` : ''};
+}
+const isNever = n => (S.p.never || []).includes(n);
+const neverLabel = n => { for (const m of MEALS) { const it = findItem(n, m.id); if (it && it.nut) return shortName(it); } return n.replace(/ FZ$/, ''); };
+const famOf = n => /egg/i.test(n) ? 'egg' : n;
+function applySwaps(meals){
+ const cnt = {}; const okV = parts => parts.every(pp => { const k = famOf(pp.it.name); return (cnt[k] || 0) < (k === 'egg' ? 1 : 2); });
+ return meals.map(x => {
+  let pick = x.ranked.find(r => okV(r.parts)) || x.ranked[0];
+  const sw = S.swaps[x.m.id];
+  if (sw) { const f = x.ranked.find(r => r.main === sw); if (f) pick = f; }
+  if (pick) pick.parts.forEach(pp => { const k = famOf(pp.it.name); cnt[k] = (cnt[k] || 0) + 1; });
+  if (!pick) return {...x, pick:null, parts:[], tot:{k:0,p:0,c:0,f:0}};
+  const isw = S.itemSwaps[x.m.id] || {};
+  const parts = pick.parts.map(pp => { const r = isw[pp.it.name]; if (!r || isNever(r.name)) return pp; const it = findItem(r.name, x.m.id); return it ? {it, m:r.m, from:pp.it.name} : pp; });
+  for (const a of ((S.adds || {})[x.m.id] || [])) { const it = findItem(a.name, x.m.id); if (it && !isNever(a.name) && !parts.some(pp => pp.it.name === a.name)) parts.push({it, m: a.m, user: true}); }
+  return {...x, pick, parts, tot: sumParts(parts)};
+ });
+}
+const ateSet = id => new Set(S.ate[id] || []);
+const eatenParts = x => { const a = ateSet(x.m.id); return x.parts.filter(pp => a.has(pp.it.name)); };
+const isFlex = x => !!(S.flex && S.flex[x.m.id]);
+const mealDone = x => isFlex(x) || !!S.done[x.m.id] || (x.parts.length > 0 && eatenParts(x).length === x.parts.length);
+const skipped = x => x.parts.length - eatenParts(x).length;
+const VOLU = new Set(['cup','cups','oz','tbsp','tsp','serving']);
+const multsFor = (it, list) => list.filter(k => VOLU.has(it.nut[5]) || Number.isInteger(it.nut[4] * k));
+const mealStarted = x => eatenParts(x).length > 0;
+function dayTotals(day, onlyEaten){
+ const t = {k:0,p:0,c:0,f:0};
+ for (const x of plan(day)) { const s = onlyEaten && isFlex(x) ? S.flex[x.m.id] : sumParts(onlyEaten ? eatenParts(x) : x.parts); t.k += s.k; t.p += s.p; t.c += s.c; t.f += s.f; }
+ if (onlyEaten && day === 'sat') for (const e of S.extras) { t.k += e.k; t.p += e.p; t.c += e.c; t.f += e.f; }
+ return t;
+}
+function lockApply(x){
+ const L = S.locked[x.m.id]; if (!L) return x;
+ const parts = L.parts ? L.parts.map(q => { const it = findItem(q.name, x.m.id); return it ? {it, m: q.m, orig: q.orig, added: q.added, from: q.from} : null; }).filter(Boolean)
+  : x.parts.filter(pp => !(L.removed || []).includes(pp.it.name)).map(pp => L.mults[pp.it.name] != null ? {...pp, m: L.mults[pp.it.name], orig: L.orig && L.orig[pp.it.name]} : pp);
+ return {...x, parts, removed: L.removed || [], tot: sumParts(parts), locked: true};
+}
+const RANGE = {cut:[0.9,1.05], maintain:[0.9,1.1], build:[0.9,1.2], perform:[0.9,1.15]};
+const rangeK = (T = targets()) => { const r = RANGE[S.p.goal] || [0.9,1.1]; return [Math.round(T.kcal*r[0]/10)*10, Math.round(T.kcal*r[1]/10)*10]; };
+function snapM(it, m){ const n = it.nut; if (VOLU.has(n[5])) return Math.floor(m*4 + 1e-6)/4; return Math.floor(n[4]*m + 1e-6)/n[4]; }
+function isUp(x){ return !mealStarted(x) && !S.done[x.m.id] && !(S.flex && S.flex[x.m.id]); }
+function eatenFixed(meals){
+ const t = {k:0, p:0, c:0, f:0};
+ for (const e of S.extras) { t.k += e.k; t.p += e.p; t.c += e.c; t.f += e.f; }
+ for (const x of meals) { if (isUp(x)) continue; const fx = S.flex && S.flex[x.m.id]; const s = fx ? fx : mealDone(x) ? sumParts(eatenParts(x)) : sumParts(x.parts); t.k += s.k; t.p += s.p; t.c += s.c; t.f += s.f; }
+ return t;
+}
+function rebalance(meals){
+ const T = targets();
+ meals = meals.map(lockApply);
+ const anything = S.extras.length || meals.some(x => !isUp(x));
+ if (!anything) return meals;
+ const fixed = eatenFixed(meals);
+ meals = meals.map(x => isUp(x) ? {...x, parts: x.parts.map(pp => ({...pp}))} : x);
+ augment(meals, T, fixed, isUp, true);
+ return meals.map(x => {
+  if (!isUp(x)) return x;
+  const removed = x.parts.filter(pp => pp.m <= 0).map(pp => pp.it.name); const ps = x.parts.filter(pp => pp.m > 0);
+  const tot = sumParts(ps); const deltaK = tot.k - x.baseTot.k;
+  return {...x, parts: ps, removed, tot, origK: x.baseTot.k, deltaK, deltaP: tot.p - x.baseTot.p, trimmed: deltaK < -25, boosted: deltaK > 25};
+ });
+}
+function slack(){ /* kcal/protein the user chose to skip, plus whether any flex meal exists */
+ const pl = plan('sat'); let k = 0, p = 0;
+ for (const x of pl) { if (isUp(x) || isFlex(x) || !mealDone(x)) continue; const e = sumParts(eatenParts(x)); k += x.tot.k - e.k; p += x.tot.p - e.p; }
+ return {k, p, flex: pl.some(isFlex)};
+}
+function overInfo(){ const {e, T} = completion(); const [lo, hi] = rangeK(T); const sl = slack(); return {over: Math.round(e.k - T.kcal), lo, hi, overRange: e.k > hi && !sl.flex, e, T}; }
+function nextMeal(){
+ return plan('sat').find(x => x.parts.length && !mealDone(x) && x.m.end > NOW.mins) || null;
+}
+function completion(){
+ const T = targets(); const e = dayTotals('sat', true); const r = (a, b) => Math.min(1, a / b);
+ const pct = (r(e.k, T.kcal)*.35 + r(e.p, T.p)*.35 + r(e.c, T.c)*.15 + r(e.f, T.f)*.15) * 100;
+ return {pct: Math.round(pct), e, T};
+}
+function todayHit(){ const {e, T} = completion(); const [lo, hi] = rangeK(T); const sl = slack(); return e.p >= T.p*0.9 - sl.p && e.k >= lo - sl.k && (e.k <= hi || sl.flex); }
+function cbox(state, attrs, label){
+ const on = state === true, mixed = state === 'mixed';
+ return `<button ${attrs} role="checkbox" aria-checked="${mixed ? 'mixed' : on}" aria-label="${esc(label)}" style="width:44px;height:44px;margin:-10px -10px -10px 0;display:flex;align-items:center;justify-content:center;flex:none"><span style="width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:${on||mixed?'var(--lime)':'transparent'};box-shadow:inset 0 0 0 1.5px ${on||mixed?'var(--lime)':'#5A6068'};color:#08090A">${on ? ic('i-check','width:14px;height:14px;stroke-width:3') : mixed ? ic('i-minus','width:14px;height:14px;stroke-width:3') : ''}</span></button>`;
+}
+function concentric(list, size = 248, sw = 14, gap = 4){
+ const c = size / 2; let out = '';
+ list.forEach(([l, v, max, col, u, overCol], i) => {
+  const r = c - sw/2 - i*(sw + gap); const pc = Math.min(100, v / max * 100);
+  const op = overCol && v > max ? Math.min(100, (v - max) / max * 100) : 0;
+  out += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${col}" stroke-opacity=".16" stroke-width="${sw}"/>`;
+  if (pc > 0.5) out += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" pathLength="100" stroke-dasharray="${pc.toFixed(1)} 100" transform="rotate(-90 ${c} ${c})" style="transition:stroke-dasharray .6s ease"/>`;
+  if (op > 0.5) out += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${overCol}" stroke-width="${sw}" stroke-linecap="round" pathLength="100" stroke-dasharray="${op.toFixed(1)} 100" transform="rotate(-90 ${c} ${c})"/>`;
+ });
+ return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">${out}</svg>`;
+}
+function qty(n, unit){
+ const v = Math.round(n * 2) / 2;
+ const s = Number.isInteger(v) ? String(v) : (v === 0.5 ? '½' : v === 0.25 ? '¼' : String(v).replace('.5','½'));
+ const sing = {slice:'slices',waffle:'waffles',donut:'donuts',pastry:'pastries',sandwich:'sandwiches',burger:'burgers',pita:'pitas',scone:'scones',muffin:'muffins',biscuit:'biscuits',potato:'potatoes',link:'links',bar:'bars',cupcake:'cupcakes',cookie:'cookies',bun:'buns',square:'squares',piece:'pieces',cup:'cups',serving:'servings',grapefruit:'grapefruit'};
+ const one = {eggs:'egg',links:'link',slices:'slice',patties:'patty',sticks:'stick',tenders:'tender',spears:'spear',wings:'wing',tots:'tot',cups:'cup'};
+ const u = v > 1 && sing[unit] ? sing[unit] : (v <= 1 && one[unit] ? one[unit] : unit);
+ return `${s} ${u}`;
+}
+function partText(x){ const n = x.it.nut; return qty(n[4]*x.m, n[5]); }
+function title(parts){
+ if (!parts.length) return 'Nothing selected';
+ const names = parts.map(x => titleName(x.it).replace(/^Assorted /,''));
+ const s = names.slice(0, 3).map((n, i) => i ? n.toLowerCase() : n).join(', ');
+ return s;
+}
+function dispName(it){
+ const n = it.name;
+ if (/ FZ$/.test(n)) return n.replace(/ FZ$/, '') + (it.tags.has('vegan') && /cheese|pizza/i.test(n) ? ' (vegan cheese · Free Zone)' : ' (Free Zone)');
+ if (/FreeZone$/.test(n)) return n.replace(/Homesfries/, 'Home fries').replace(/ ?FreeZone$/, '') + ' (Free Zone)';
+ return n;
+}
+const shortName = it => dispName(it).replace(/ \(.*\)$/, '');
+const titleName = it => dispName(it).replace(' · Free Zone', '').replace(' (Free Zone)', '');
+const ROLEICON = {P:'i-drum', X:'i-pizza', C:'i-bowl', V:'i-leaf', F:'i-apple', D:'i-milk', S:'i-cake', K:'i-drop'};
+function itemIcon(it){ return it.nut ? ROLEICON[it.nut[6]] : 'i-dining'; }
+
+function ring(size, sw, pct, color, inner, label){
+ const r = (size - sw) / 2; const c = size / 2;
+ return `<div style="position:relative;width:${size}px;height:${size}px;flex:none" ${label?`role="img" aria-label="${esc(label)}"`:''}>
+ <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#1C1F22" stroke-width="${sw}"/>${pct>0?`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" pathLength="100" stroke-dasharray="${Math.min(pct,100).toFixed(1)} 100" transform="rotate(-90 ${c} ${c})" style="transition:stroke-dasharray .6s ease"/>`:''}</svg>
+ <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">${inner}</div></div>`;
+}
+function donut(t, size = 148){
+ const pk = t.p*4, ck = t.c*4, fk = t.f*9, tot = pk + ck + fk || 1; const gap = 1.5;
+ const pp = pk/tot*100, cp = ck/tot*100, fp = fk/tot*100; const r = size/2 - 8; const c = size/2;
+ const seg = (v, off, col) => v > gap ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${col}" stroke-width="14" pathLength="100" stroke-dasharray="${(v-gap).toFixed(2)} 100" stroke-dashoffset="${(-off).toFixed(2)}"/>` : '';
+ return `<div style="position:relative;width:${size}px;height:${size}px;flex:none" role="img" aria-label="Protein ${Math.round(t.p)} g, carbs ${Math.round(t.c)} g, fat ${Math.round(t.f)} g">
+ <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><g transform="rotate(-90 ${c} ${c})"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#1C1F22" stroke-width="14"/>${seg(pp,0,'#B8F135')}${seg(cp,pp,'#FF9432')}${seg(fp,pp+cp,'#C9CED4')}</g></svg>
+ <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span class="n" style="font-size:40px">${fmt(t.k)}</span><span class="u">kcal</span></div></div>`;
+}
+function legend(t){
+ const row = (col, l, v) => `<div class="row" style="gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:${col}"></span><span class="t2" style="flex:1">${l}</span><span class="n" style="font-size:22px">${Math.round(v)}<span class="u"> g</span></span></div>`;
+ return `<div class="g" style="gap:14px;flex:1">${row('#B8F135','Protein',t.p)}${row('#FF9432','Carbs',t.c)}${row('#C9CED4','Fat',t.f)}</div>`;
+}
+function bar(label, v, max, col, unit = ''){
+ return `<div class="g" style="gap:8px"><div class="row sb"><span style="font-weight:500">${label}</span><span><span class="n" style="font-size:20px">${fmt(v)}</span><span class="u"> / ${fmt(max)}${unit}</span></span></div><div class="tr"><div class="fl" style="width:${Math.min(100, v/max*100).toFixed(1)}%;background:${col}"></div></div></div>`;
+}
+const has = k => !!S.device && !!(S.perms && S.perms[k]);
+const fuel = () => has('recovery') ? WEAR.recovery : null;
+const permCount = () => PERMS.filter(x => S.perms[x[0]]).length;
+function tagsText(it){
+ const keep = ['vegan','vegetarian','gluten free','halal','kosher'];
+ const al = ALLERGENS.filter(a => it.tags.has(a[0])).map(a => a[1]);
+ const d = keep.filter(k => it.tags.has(k)).map(k => k[0].toUpperCase() + k.slice(1));
+ return {diet: d, allergens: al.concat(it.tags.has('pork') ? ['Pork'] : [])};
+}
+
+/* ========================= CLAUDE =========================
+   Backend: Claude Haiku via callClaude('plate_why' | 'daily_summary' | 'weekly_report'), Claude Sonnet via callClaude('goal_plan').
+   Every number comes from the app's own data; Claude only writes the words. If Claude is unavailable,
+   errors, or takes longer than 8 s, the template text (built from the same numbers) stays on screen. */
+let SAMPLE = null;
+(async () => { try { if (window.claude && window.claude.use) SAMPLE = await window.claude.use('sample'); } catch (e) { SAMPLE = null; } })();
+const AI = {};
+function aiId(s){ let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; return 'ai' + h.toString(36); }
+const PROMPTS = {
+ plate_why: d => `You write one or two short sentences (max 40 words) for a college nutrition app explaining why this dining hall plate was chosen. Plain text, no markdown, no emoji, no new numbers beyond those given. Never use the word "cheat".\nData: ${JSON.stringify(d)}`,
+ daily_summary: d => `You write a 2-sentence end-of-day note for a college nutrition app: first sentence says what went well or missed using only these numbers, second gives one concrete suggestion for tomorrow using only the menu items given. Plain text, max 45 words, no markdown, no emoji, no new numbers, never the word "cheat".\nData: ${JSON.stringify(d)}`,
+ weekly_report: d => `You write a short weekly report paragraph (max 60 words) for a college nutrition app using only these numbers. Plain text, no markdown, no emoji, no new numbers.\nData: ${JSON.stringify(d)}`,
+ goal_plan: d => `You write a 2-sentence plan summary (max 50 words) for a college student's body-weight goal using only these numbers. Explain the pace and, if the date was extended, why in plain words. Plain text, no markdown, no emoji, no new numbers.\nData: ${JSON.stringify(d)}`
+};
+function callClaude(kind, data, fallback, model = 'haiku'){
+ const key = aiId(kind + JSON.stringify(data));
+ if (AI[key]) return {key, ...AI[key]};
+ AI[key] = {text: fallback, src: 'template'};
+ if (SAMPLE) {
+  const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 8000);
+  const opts = {signal: ctrl.signal, cache: true, modelTier: model === 'sonnet' ? 'default' : 'quick', model: model === 'sonnet' ? 'claude-sonnet-5-5' : 'claude-haiku-5-5'};
+  Promise.resolve().then(() => SAMPLE(PROMPTS[kind](data), opts)).then(r => {
+   const t = String((r && r.text) || '').trim().replace(/\bcheat\w*/gi, 'flex');
+   if (t && !(r && r.truncated && t.length < 20)) { AI[key] = {text: t, src: 'claude'}; document.querySelectorAll(`[data-ai="${key}"]`).forEach(el => { el.textContent = t; }); }
+  }).catch(() => {}).finally(() => clearTimeout(timer));
+ }
+ return {key, ...AI[key]};
+}
+const aiTag = (label = 'Claude') => `<span style="display:inline-flex;align-items:center;gap:4px;font:600 11px Inter,sans-serif;letter-spacing:.3px;color:var(--t3);text-transform:uppercase">${ic('i-bolt','width:11px;height:11px')}${label}</span>`;
+function aiText(kind, data, fallback, model){ const r = callClaude(kind, data, fallback, model); return `<span data-ai="${r.key}">${esc(r.text)}</span>`; }
+
+function plateWhy(x){
+ const T = targets(); const ps = x.parts.slice().sort((a, b) => b.it.nut[1]*b.m - a.it.nut[1]*a.m);
+ const lead = ps[0]; const carb = x.parts.find(pp => ['C','X'].includes(pp.it.nut[6]) && pp !== lead);
+ const leadP = Math.round(lead.it.nut[1]*lead.m); const strain = has('recovery');
+ const fb = `Leads with ${shortName(lead.it).toLowerCase()} for ${leadP} g protein${strain ? ' because it\'s a high-strain day' : ` toward your ${T.p} g target`}${carb ? `, with ${shortName(carb.it).toLowerCase()} for the carbs${T.dev ? ' Whoop added' : ''}` : ''}.${x.boosted ? ' Portions are up to cover what you skipped.' : x.trimmed ? ' Portions are trimmed to keep today in range.' : ''}`;
+ const data = {meal: x.m.name, goal: GOALS[S.p.goal].label, items: x.parts.map(pp => ({name: dispName(pp.it), portion: partText(pp), protein_g: Math.round(pp.it.nut[1]*pp.m), kcal: Math.round(pp.it.nut[0]*pp.m)})), plate_kcal: Math.round(x.tot.k), plate_protein_g: Math.round(x.tot.p), high_strain_day: strain, whoop_added_kcal: T.dev, adjusted: x.boosted ? 'bigger to cover skipped food' : x.trimmed ? 'smaller to stay in range' : 'as planned'};
+ return `<div class="row" style="gap:8px;align-items:flex-start;padding-top:2px"><div style="flex:1;font-size:14px;line-height:1.5"><div style="margin-bottom:4px">${aiTag('Claude · why this plate')}</div><span class="t2">${aiText('plate_why', data, fb)}</span></div></div>`;
+}
+function daySummary(){
+ const {e, T} = completion(); const [lo, hi] = rangeK(T); const pl = plan('sat'); const sl = slack();
+ const logged = pl.filter(mealDone).length; const tomorrow = plan('sun'); const bt = tomorrow[0];
+ const lead = bt ? bt.parts.slice().sort((a, b) => b.it.nut[1]*b.m - a.it.nut[1]*a.m)[0] : null;
+ const rows = [
+  ['Protein', `${Math.round(e.p)} / ${T.p} g`, e.p >= T.p*0.9 - sl.p],
+  ['Calories', `${fmt(e.k)} / ${fmt(T.kcal)}`, e.k >= lo - sl.k && (e.k <= hi || sl.flex)],
+  ['Meals logged', `${logged} / ${pl.length}`, logged === pl.length]
+ ];
+ const pShort = Math.max(0, Math.round(T.p - e.p));
+ const fb = `${rows[0][2] ? 'Protein is on target' : `You're ${pShort} g short on protein so far`}${sl.flex ? ', with a flex meal folded in' : ''}. Tomorrow: ${lead ? `start brunch with ${shortName(lead.it).toLowerCase()}, the biggest protein on the menu.` : 'check Plan for brunch.'}`;
+ const data = {protein_g: Math.round(e.p), protein_target_g: T.p, kcal: Math.round(e.k), kcal_target: T.kcal, kcal_range: [lo, hi], meals_logged: logged, meals_planned: pl.length, flex_meal: sl.flex, skipped_kcal: Math.round(sl.k), tomorrow_brunch_top_protein_item: lead ? dispName(lead.it) : null};
+ return `<section class="card g" style="gap:14px" aria-label="Today so far"><div class="row sb"><span class="lbl">Today so far</span>${aiTag()}</div>
+  <div class="g" style="gap:8px">${rows.map(([l, v, ok]) => `<div class="row" style="font-size:14px"><span style="width:20px;height:20px;border-radius:999px;flex:none;display:flex;align-items:center;justify-content:center;background:${ok?'var(--lime)':'transparent'};box-shadow:inset 0 0 0 1.5px ${ok?'var(--lime)':'#5A6068'};color:#08090A">${ok?ic('i-check','width:12px;height:12px;stroke-width:3'):''}</span><span style="flex:1">${l}</span><span class="n" style="font-size:17px">${v}</span></div>`).join('')}</div>
+  <p style="margin:0;font-size:14px;line-height:1.5" class="t2">${aiText('daily_summary', data, fb)}</p></section>`;
+}
+
+/* ========================= VIEWS ========================= */
+function vLogin(){
+ return `<div class="bd" style="justify-content:space-between;padding-top:72px">
+ <div class="g" style="gap:20px">
+  <div class="brand">HACKRO</div>
+  <h1 class="h1" style="font-size:40px">Hack the dining hall</h1>
+  <p class="sub">Stop guessing, we got you</p>
+ </div>
+ <form class="g" style="gap:12px" data-form="login">
+  <label class="field"><span>School email</span><input class="inp" type="email" name="email" autocomplete="email" placeholder="you@swarthmore.edu" value="${esc(S.p.email)}" data-k="email"></label>
+  <label class="field"><span>Password</span><input class="inp" type="password" name="pw" autocomplete="current-password" placeholder="Any password works in the demo"></label>
+  <button class="cta" type="submit" style="margin-top:8px">Sign in</button>
+  <button class="ghost" type="button" data-a="login">Create an account</button>
+  <p class="note" style="text-align:center;margin:0">Demo build. Nothing is sent anywhere; your answers stay in this browser.</p>
+ </form>
+ </div>`;
+}
+
+const OB_STEPS = 4;
+const OBKEYS = ['basics', 'avoid', 'goal', 'train'];
+function obValid(st = S.step, p = S.p){
+ const key = typeof st === 'number' ? OBKEYS[st] : st;
+ const num = (v, lo, hi) => v !== '' && v !== null && v !== undefined && !isNaN(+v) && +v >= lo && +v <= hi;
+ if (key === 'basics') return !!String(p.name || '').trim() && !!p.sex && num(p.age, 16, 30) && num(p.lb, 80, 400) && num(p.ft, 4, 7) && num(p.inch, 0, 11);
+ if (key === 'goal') return !!p.goal;
+ if (key === 'train') return p.days !== null && p.days !== undefined;
+ return !!p.dietPicked && !!p.allergySet && (!p.otherOn || !!otherOf(p).trim());
+}
+function obErrors(st = S.step, p = S.p, all = false){
+ const key = typeof st === 'number' ? OBKEYS[st] : st; const out = [];
+ const has = v => v !== '' && v !== null && v !== undefined; const bad = (v, lo, hi) => isNaN(+v) || +v < lo || +v > hi;
+ if (key === 'basics') {
+  if (all && !String(p.name || '').trim()) out.push('Add your first name.');
+  if (all && !p.sex) out.push('Pick male or female for the energy math.');
+  if (has(p.age) ? bad(p.age, 16, 30) : all) out.push('Age must be 16–30.');
+  if (has(p.lb) ? bad(p.lb, 80, 400) : all) out.push('Weight must be 80–400 lb.');
+  if (has(p.ft) ? bad(p.ft, 4, 7) : all) out.push('Height must be 4–7 ft.');
+  if (has(p.inch) ? bad(p.inch, 0, 11) : all) out.push('Inches must be 0–11.');
+ } else if (key === 'avoid') {
+  if (all && !p.dietPicked) out.push('Pick a diet option. "Nothing" is fine.');
+  if (all && !p.allergySet) out.push('Choose "No allergies" or pick yours.');
+  if (p.otherOn && !otherOf(p).trim() && all) out.push('Type your other allergy, or turn "Other" off.');
+ } else if (key === 'goal') { if (all && !p.goal) out.push('Pick a goal.'); }
+ else if (key === 'train') { if (all && (p.days === null || p.days === undefined)) out.push('Pick how many days you train.'); }
+ return out;
+}
+const errBox = (st) => { const e = obErrors(st, S.p, !!S.obTried); return e.length ? `<div class="g" style="gap:4px" role="alert">${e.map(m => `<div class="row" style="gap:6px;font-size:14px;color:var(--garnet-t)">${ic('i-alert','width:14px;height:14px')}${m}</div>`).join('')}</div>` : ''; };
+function numField(k, v, unit, ph, label){
+ return `<label class="field"><span>${label}</span><div class="row" style="height:52px;border-radius:16px;background:var(--s1);padding:0 16px;gap:8px"><input class="inp" style="background:transparent;padding:0;height:50px;flex:1;min-width:0;box-shadow:none" type="number" inputmode="numeric" data-k="${k}" data-num="1" value="${esc(v ?? '')}" placeholder="${ph}"><span class="u">${unit}</span></div></label>`;
+}
+function obHead(t, sub){
+ return `<div class="g" style="gap:8px"><h1 class="h1">${t}</h1>${sub?`<p class="sub">${sub}</p>`:''}</div>`;
+}
+function stepper(k, v, unit, min, max, step = 1){
+ return `<div class="stepper"><button type="button" aria-label="Decrease" data-a="step" data-k="${k}" data-d="${-step}" data-min="${min}" data-max="${max}">${ic('i-minus','width:18px;height:18px')}</button><span><span class="n" style="font-size:24px">${v}</span><span class="u"> ${unit}</span></span><button type="button" aria-label="Increase" data-a="step" data-k="${k}" data-d="${step}" data-min="${min}" data-max="${max}">${ic('i-plus','width:18px;height:18px')}</button></div>`;
+}
+function obBody(step, p = S.p){
+ const key = typeof step === 'number' ? OBKEYS[step] : step;
+ if (key === 'basics') return `${obHead('First, the basics', 'We use these for your energy math. They never leave this browser.')}
+  <div class="g" style="gap:20px">
+  <label class="field"><span>First name</span><input class="inp" data-k="name" value="${esc(p.name)}" autocomplete="given-name" placeholder="What should we call you?"></label>
+  <div class="field"><span>Campus</span><div class="row" style="height:52px;border-radius:16px;background:var(--s1);padding:0 16px"><span style="flex:1;font-weight:500">Swarthmore College</span><span class="u">Dining Center menus</span></div></div>
+  <div class="field"><span>Sex for energy math</span><div class="seg" style="grid-template-columns:1fr 1fr">${[['male','Male'],['female','Female']].map(([v,l]) => `<button type="button" class="${p.sex===v?'on':''}" data-a="set" data-k="sex" data-v="${v}">${l}</button>`).join('')}</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${numField('age', p.age, 'years', 'Age', 'Age')}${numField('lb', p.lb, 'lb', 'Weight', 'Weight')}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${numField('ft', p.ft, 'ft', 'Feet', 'Height')}${numField('inch', p.inch, 'in', 'Inches', '&nbsp;')}</div>
+  </div>`;
+ if (key === 'goal') return `${obHead('What are you training for?', 'This sets your calorie and protein targets.')}
+  <div class="g" style="gap:8px">${Object.entries(GOALS).map(([k, g]) => `<button type="button" class="opt ${p.goal===k?'on':''}" data-a="set" data-k="goal" data-v="${k}" aria-pressed="${p.goal===k}"><span class="radio"></span><span style="flex:1"><span style="display:block;font:600 16px Inter,sans-serif">${g.label}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${g.d}</span></span></button>`).join('')}</div>`;
+ if (key === 'train') return `${obHead('How hard do you train?', 'Training days set how much energy you burn in a typical week.')}
+  <div class="g" style="gap:20px">
+  <div class="field"><span>Training days per week</span><div class="seg" style="grid-template-columns:repeat(8,minmax(0,1fr))">${[0,1,2,3,4,5,6,7].map(d => `<button type="button" class="${p.days===d?'on':''}" data-a="set" data-k="days" data-v="${d}" data-num="1">${d}</button>`).join('')}</div></div>
+  <div class="field"><span>Training types · pick all that apply</span><div class="chips">${['Lifting','Varsity sport','Club sport','Running','Mixed','Mostly walking'].map(s => { const on = (Array.isArray(p.sport) ? p.sport : p.sport ? [p.sport] : []).includes(s); return `<button type="button" class="chip ${on?'on':''}" data-a="sport" data-v="${s}" aria-pressed="${on}">${s}</button>`; }).join('')}</div></div>
+  </div>`;
+ return `${obHead('Anything we should avoid?', "Allergies are hard rules. We use the Dining Center's own labels, and anything without allergen data is left out of your plan.")}
+  <div class="g" style="gap:20px">
+  <div class="field"><span>Diet restrictions</span><div class="chips">${[['omnivore','Nothing'],['vegetarian','Vegetarian'],['vegan','Vegan'],['pescatarian','Pescatarian']].map(([v,l]) => `<button type="button" class="chip ${p.dietPicked && dietOf(p)===v?'on':''}" data-a="setDiet" data-v="${v}">${l}</button>`).join('')}</div></div>
+  <div class="field"><span>Allergies</span><div class="chips"><button type="button" class="chip ${p.allergySet && !allergiesOf(p).length && !p.otherOn?'on':''}" data-a="noAllergy" aria-pressed="${p.allergySet && !allergiesOf(p).length && !p.otherOn}">No allergies</button>${ALLERGENS.map(([v,l]) => `<button type="button" class="chip ${allergiesOf(p).includes(v)?'on':''}" data-a="allergy" data-v="${v}" aria-pressed="${allergiesOf(p).includes(v)}">${l}</button>`).join('')}<button type="button" class="chip ${p.otherOn?'on':''}" data-a="otherAllergy" aria-pressed="${!!p.otherOn}">Other (type it)</button></div>
+  ${p.otherOn ? `<input class="inp" data-otherinput="1" value="${esc(otherOf(p))}" placeholder="e.g. mushroom, coconut" aria-label="Other allergy" style="margin-top:4px"><span class="note" style="text-transform:none;letter-spacing:0;font:400 12px Inter,sans-serif">Dining Services doesn't label this one, so we match it against dish names and skip anything unlabeled. Always confirm with staff.</span>` : ''}</div>
+  <button type="button" class="card row" data-a="toggle" data-k="halal" style="text-align:left"><span style="flex:1"><span style="display:block;font-weight:600">Halal only</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Only meat the Dining Center labels halal</span></span><span class="tog ${p.halal?'on':''}" role="switch" aria-checked="${p.halal}"></span></button>
+  </div>`;
+}
+function vOnboard(){
+ const st = S.step;
+ return `<div class="bd" style="gap:28px">
+ <div class="g" style="gap:16px">
+  <div class="top">${st>0?`<button class="ib" data-a="obBack" aria-label="Back">${ic('i-back')}</button>`:'<span></span>'}<span class="lbl">Step ${st+1} of ${OB_STEPS}</span><span></span></div>
+  <div class="prog" style="grid-template-columns:repeat(${OB_STEPS},1fr)">${Array.from({length:OB_STEPS},(_,i)=>`<span class="${i<=st?'on':''}"></span>`).join('')}</div>
+ </div>
+ <div class="g fadein" style="gap:24px;flex:1">${obBody(OBKEYS[st])}</div>
+ <div id="obErr">${errBox(st)}</div>
+ <button class="cta" data-a="obNext">${st < OB_STEPS-1 ? 'Continue' : 'Build my plan'}</button>
+ </div>`;
+}
+
+function vGen(){
+ const T = targets(); const n = S.gen;
+ const steps = [
+  `Reading Saturday's Dining Center menu`,
+  `Filtering ${itemsFor('sat-b').length + itemsFor('sat-l').length + itemsFor('sat-d').length} items for your diet${allergiesOf(S.p).length ? ' and allergies' : ''}`,
+  `Setting targets: ${fmt(T.kcal)} kcal, ${T.p}g protein`,
+  `Balancing ${mealsOfDay('sat').length} meals across 9 stations`
+ ];
+ return `<div class="bd" style="padding-top:64px" aria-busy="true">
+ <div class="g" style="gap:8px"><span class="lbl">Building your plan</span><h1 class="h1">Matching your goals to what's being served</h1></div>
+ <div class="g" style="gap:16px" role="status">${steps.map((s, i) => `<div class="check" style="opacity:${i<=n?1:.35};transition:opacity .3s"><span class="dot" style="background:${i<n?'var(--lime)':'var(--s2)'};color:#08090A">${i<n?ic('i-check','width:14px;height:14px;stroke-width:3'):(i===n?`<svg width="14" height="14" viewBox="0 0 24 24" class="spin" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#2C3036" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="#B4BAC1" stroke-width="3" stroke-linecap="round"/></svg>`:'')}</span><span>${s}</span></div>`).join('')}</div>
+ <div class="card g" style="gap:14px"><div class="sk" style="height:13px;width:36%"></div><div class="sk" style="height:22px;width:84%"></div><div class="sk" style="height:14px;width:60%"></div><div class="row" style="gap:20px"><div class="sk" style="height:28px;width:80px"></div><div class="sk" style="height:28px;width:80px"></div></div></div>
+ <div class="card g" style="gap:14px;opacity:.6"><div class="sk" style="height:13px;width:30%"></div><div class="sk" style="height:22px;width:70%"></div><div class="sk" style="height:14px;width:52%"></div></div>
+ </div>`;
+}
+
+function mealRow(x, opts = {}){
+ const fx = isFlex(x) ? S.flex[x.m.id] : null;
+ const done = mealDone(x), part = !done && mealStarted(x), nx = opts.next, canCheck = x.m.day === NOW.day && !opts.noCheck;
+ const up = canCheck && isUp(x);
+ const eatK = fx ? fx.k : sumParts(eatenParts(x)).k;
+ const showEaten = !fx && (done || part) && eatK < x.tot.k - 5;
+ const hours = x.m.kind === 'snack' ? (mealDone(plan('sat').find(y => y.m.id === 'sat-b') || {m:{id:'sat-b'}, parts:[]}) ? '3:30 PM' : x.m.hours) : 'Dining Center · ' + x.m.hours;
+ const adj = x.deltaK && Math.abs(x.deltaK) >= 20 ? `<span style="color:var(--amber)"> · ${x.deltaK > 0 ? '+' : '−'}${fmt(Math.abs(x.deltaK))} kcal</span>` : '';
+ return `<div class="row" style="gap:0;border-radius:16px;${nx?'background:var(--s2)':''}">
+ <button class="meal" data-a="open" data-v="meal:${x.m.id}" style="flex:1;${done?'opacity:.6':''}">
+ <span class="mt" style="${nx?'color:var(--tx)':''}">${clock(x.m.time)}<span style="display:block;font-size:12px;margin-top:3px;color:var(--t3)">${ampm(x.m.time)}</span></span>
+ <span style="min-width:0"><span class="lbl" style="${nx?'color:var(--lime)':''}">${x.m.name}${fx ? ' · Flex' : ''}${nx?' · Next':''}${part?' · Partly eaten':''}${!fx && done && skipped(x) ? ` · Skipped ${skipped(x)}` : ''}${adj}</span>
+ <span style="display:block;font:600 16px/1.3 Inter,sans-serif;margin-top:6px;text-wrap:balance">${fx ? `Flex meal${fx.est ? ' · assumed as planned' : ''}` : x.parts.length ? esc(title(x.parts)) : 'Skipped to stay in range'}</span>
+ <span class="t2" style="display:block;font-size:13px;margin-top:3px">${fx ? 'Eaten off-plan' : hours}</span></span>
+ <span style="text-align:right;line-height:1.35">${showEaten ? `<span class="n" style="display:block;font-size:18px">${fmt(eatK)}</span><span class="u">of ${fmt(x.tot.k)}</span>` : `<span class="n" style="display:block;font-size:18px">${fmt(fx ? fx.k : x.tot.k)}</span><span class="u">${Math.round(fx ? fx.p : x.tot.p)}g P</span>`}</span>
+ </button>
+ ${up ? `<button class="chip" style="height:32px;padding:0 10px;margin-right:6px;background:var(--s2);font-size:12px" data-a="flex" data-v="${x.m.id}" aria-label="Make ${x.m.name} a flex meal">Flex</button>` : ''}
+ ${fx && canCheck ? `<button class="chip" style="height:32px;padding:0 10px;margin-right:12px;background:var(--s2);font-size:12px" data-a="unflex" data-v="${x.m.id}">Undo</button>` : canCheck && x.parts.length ? `<span style="padding:0 18px 0 2px">${cbox(done ? true : part ? 'mixed' : false, `data-a="eatMeal" data-v="${x.m.id}"`, `${done?'Unmark':'Mark'} ${x.m.name} as eaten`)}</span>` : ''}
+ </div>`;
+}
+
+function howWeGot(T){
+ const g = GOALS[S.p.goal];
+ const row = (l, v) => `<div class="row sb" style="align-items:flex-start;gap:16px"><span class="t2">${l}</span><span class="n" style="font-size:18px;white-space:nowrap">${v}</span></div>`;
+ return `<details class="card" style="padding:16px"><summary class="row sb" style="cursor:pointer;list-style:none"><span style="font-weight:600">How we got ${fmt(T.kcal)} kcal</span>${ic('i-chev','color:var(--t3)')}</summary>
+  <div class="g" style="gap:10px;margin-top:14px;font-size:14px">
+   ${row('Resting energy (Mifflin-St Jeor)', fmt(T.bmr))}
+   ${row(`× ${T.af}, ${T.afLabel}`, fmt(T.tdee))}
+   ${row(`${g.label}: ${T.adjNote}`, (T.adj >= 0 ? '+' : '−') + fmt(Math.abs(T.adj)))}
+   ${T.floored ? `<div class="row" style="gap:8px;color:var(--amber)">${ic('i-shield','width:16px;height:16px')}<span>Set to your safe minimum: ${fmt(T.floor)} kcal.</span></div>` : ''}
+   ${T.dev ? row('Whoop: high strain today, good recovery (mostly carbs)', '+' + T.dev) : ''}
+   ${row(`Protein at ${g.pk} g/kg`, T.p + 'g')}
+  </div></details>`;
+}
+function vReveal(){
+ const T = targets(); const pl = plan('sat'); const tot = dayTotals('sat');
+ return `<div class="bd">
+ <div class="g" style="gap:8px;padding-top:24px"><span class="lbl">Your plan · ${DAYS.sat.label}</span>
+ <h1 class="h1">${fmt(T.kcal)} kcal and ${T.p}g protein, all from the Dining Center</h1>
+ <p class="sub">${GOALS[S.p.goal].label} for ${S.p.days} training days a week. Every item below is on Saturday's menu.</p></div>
+ <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
+  ${[['kcal',fmt(T.kcal),'var(--tx)'],['Protein',T.p+'g','var(--lime)'],['Carbs',T.c+'g','var(--tx)'],['Fat',T.f+'g','var(--tx)']].map(([l,v,c]) => `<div><div class="n" style="font-size:28px;color:${c}">${v}</div><div class="lbl" style="margin-top:8px">${l}</div></div>`).join('')}
+ </div>
+ <section class="card" style="padding:8px" aria-label="Saturday meals">${pl.map(x => mealRow(x, {noCheck:true})).join('')}<div style="padding:4px 12px 10px">${xcNote()}</div></section>
+ <div class="g" style="gap:8px">
+  <div class="row sb"><span class="t2">Planned total</span><span><span class="n" style="font-size:20px">${fmt(tot.k)}</span><span class="u"> kcal · </span><span class="n" style="font-size:20px">${Math.round(tot.p)}</span><span class="u">g protein</span></span></div>
+  ${(() => { const st = planStatus('sat'); return st.ok ? '' : `<p style="margin:0;font-size:14px;color:var(--amber)">${st.msg}</p>`; })()}
+  <p class="note" style="margin:0">Menu and allergen labels from Swarthmore Dining. Calories and macros are Hackro estimates per serving; NetNutrition has the official numbers.</p>
+ </div>
+ ${howWeGot(T)}
+ <div class="g" style="gap:4px">
+  <div class="card g" style="gap:14px"><div class="row"><span class="tile">${ic('i-band')}</span><span style="flex:1"><span style="display:block;font:600 17px Inter,sans-serif">Do you wear a Whoop?</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">It lets strain and recovery adjust your targets each morning</span></span></div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px"><button class="cta inr" data-a="whoopYes">Yes, connect it</button><button class="ghost fill" data-a="whoopNo">No Whoop</button></div></div>
+ </div>
+ </div>`;
+}
+
+function vConnect(){
+ return `<div class="bd">
+ <div class="top" style="padding-top:8px"><button class="ib" data-a="go" data-v="reveal" aria-label="Back">${ic('i-back')}</button><span class="lbl">Connect Whoop</span><span></span></div>
+ <div class="g" style="gap:8px"><h1 class="h1">Let today's strain and recovery move your targets</h1>
+ <p class="sub">Hackro reads Whoop every morning and adjusts calories and carbs before your first meal. You choose exactly which data it sees.</p></div>
+ <section class="card g" style="gap:16px" aria-label="Whoop">
+  <div class="row"><span class="tile" style="width:52px;height:52px;border-radius:12px">${ic('i-band','width:26px;height:26px')}</span><span style="flex:1"><span style="display:block;font:600 17px Inter,sans-serif">Whoop</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Read-only · change anytime in You</span></span></div>
+  <div class="g" style="gap:10px">${PERMS.map(([k,i,l,d]) => `<div class="row" style="font-size:14px">${ic(i,'width:18px;height:18px;color:var(--t2)')}<span style="flex:1">${l}</span><span class="t3" style="font-size:12px">${d}</span></div>`).join('')}</div>
+  <button class="cta inr" data-a="auth" data-v="whoop">Choose data and connect</button>
+ </section>
+ <p class="note" style="margin:0">Demo connection: shows sample data, no account is linked.</p>
+ <button class="ghost" data-a="enter" style="margin-top:auto">Not now</button>
+ </div>`;
+}
+
+function sheetAuth(id){
+ const d = DEVICES.find(x => x.id === id); const pm = S.sheet.perms; const n = PERMS.filter(x => pm[x[0]]).length; const editing = S.device === id;
+ return `<div class="row sb"><span class="tile" style="width:52px;height:52px;border-radius:16px;background:var(--s2)">${ic(d.icon,'width:26px;height:26px')}</span><button class="ib" style="background:var(--s2)" data-a="closeSheet" aria-label="Close">${ic('i-x')}</button></div>
+ <div class="g" style="gap:8px"><h2 class="h1" style="font-size:28px">Choose what Hackro reads from ${d.name}</h2><p class="sub">Read-only. Turn anything off and the features that use it hide.</p></div>
+ <div class="in" style="padding:0 14px"><div class="list">${PERMS.map(([k,i,l,desc]) => `<button class="row" data-a="perm" data-v="${k}" role="switch" aria-checked="${!!pm[k]}" style="padding:12px 0;width:100%;text-align:left">${ic(i,'color:var(--t2)')}<span style="flex:1;min-width:0"><span style="display:block">${l}</span><span class="t3" style="display:block;font-size:12px;margin-top:2px">${desc}</span></span><span class="tog ${pm[k]?'on':''}"></span></button>`).join('')}</div></div>
+ <p class="note" style="margin:0;min-height:36px;visibility:${!pm.recovery ? 'visible' : 'hidden'}">With recovery off there's no Fuel Score, and targets won't adjust for hard days.</p>
+ <div class="g" style="gap:4px"><button class="cta" data-a="allow" data-v="${id}" ${n?'':'disabled'}>${n ? (editing ? `Save · sharing ${n} of ${PERMS.length}` : `Allow ${n} and sync`) : 'Pick at least one'}</button>
+ ${editing ? `<button class="ghost" data-a="disconnect" style="color:var(--garnet-t)">Disconnect ${d.name}</button>` : `<button class="ghost" data-a="closeSheet">Cancel</button>`}</div>`;
+}
+function sheetSync(id){
+ const d = DEVICES.find(x => x.id === id);
+ return `<div class="g" style="gap:20px;align-items:center;text-align:center;padding:24px 0" role="status" aria-busy="true">
+ <svg width="64" height="64" viewBox="0 0 24 24" class="spin" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#2C3036" stroke-width="2"/><path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="#B8F135" stroke-width="2" stroke-linecap="round"/></svg>
+ <div class="g" style="gap:6px"><h2 class="h1" style="font-size:28px">Syncing ${d.name}</h2><p class="sub">Pulling the last 7 days of ${PERMS.filter(x => S.sheet.perms && S.sheet.perms[x[0]]).map(x => x[2].split(' ')[0].toLowerCase()).join(', ')}…</p></div>
+ </div>`;
+}
+function sheetSynced(id){
+ const d = DEVICES.find(x => x.id === id); const T = targets(); const f = fuel();
+ const tiles = [has('recovery') && [WEAR.recovery+'%', 'Recovery', 'var(--lime)'], has('recovery') && [WEAR.strain, 'Strain today', 'var(--blue)']].filter(Boolean);
+ return `<div class="g" style="gap:8px"><span class="lbl" style="color:var(--green)">${d.name} connected · ${permCount()} of ${PERMS.length} data types</span><h2 class="h1" style="font-size:30px">${f != null ? `Fuel Score ${f}: you're recovered and cleared to build` : `Connected. Your targets stay steady for now`}</h2></div>
+ ${tiles.length ? `<div style="display:grid;grid-template-columns:repeat(${tiles.length},minmax(0,1fr));gap:8px;text-align:center">${tiles.map(([v,l,c]) => `<div class="in" style="padding:14px 6px"><div class="n" style="font-size:26px;color:${c}">${v}</div><div class="lbl" style="margin-top:8px">${l}</div></div>`).join('')}</div>` : ''}
+ ${has('recovery') ? `<div class="in row" style="padding:14px;align-items:flex-start">${ic('i-trend','color:var(--lime);margin-top:1px')}<div style="font-size:14px;line-height:1.5"><b style="font-weight:600">Today's target is now ${fmt(T.kcal)} kcal.</b><span class="t2"> High strain today (${WEAR.strain}) and good recovery, so +150 kcal, mostly carbs.</span></div></div>` : `<div class="in row" style="padding:14px;align-items:flex-start">${ic('i-info','color:var(--t2);margin-top:1px')}<div style="font-size:14px;line-height:1.5" class="t2">Strain and recovery are off, so targets stay at ${fmt(T.kcal)} kcal. Turn them on anytime in You.</div></div>`}
+ <button class="cta" data-a="enter">Explore Hackro</button>`;
+}
+
+function swapCands(mealId, key){
+ const x = plan(mealById(mealId).day).find(y => y.m.id === mealId);
+ const pp = x.parts.find(q => (q.from || q.it.name) === key); const role = pp.it.nut[6];
+ const grp = ['P','X'].includes(role) ? ['P','X'] : ['V','F'].includes(role) ? ['V','F'] : ['C','S'].includes(role) ? ['C'] : [role];
+ const inMeal = new Set(x.parts.map(q => q.it.name)); const k0 = pp.it.nut[0]*pp.m, p0 = pp.it.nut[1]*pp.m;
+ const out = itemsFor(mealId).filter(it => fits(it) && grp.includes(it.nut[6]) && !inMeal.has(it.name)).map(it => {
+  let best = null;
+  for (const m of multsFor(it, [0.5,1,1.5,2,2.5,3])) { const k = it.nut[0]*m, p = it.nut[1]*m; const e = Math.abs(k-k0)/Math.max(k0,50) + 1.2*Math.abs(p-p0)/Math.max(p0,8); if (!best || e < best.e) best = {it, m, k, p, e}; }
+  return best;
+ }).filter(Boolean).sort((a, b) => a.e - b.e).slice(0, 6);
+ return {pp, k0, p0, out, x};
+}
+function sheetISwap(mealId, key){
+ const {pp, k0, p0, out, x} = swapCands(mealId, key);
+ return `<div class="row sb" style="align-items:flex-start"><div class="g" style="gap:8px"><span class="lbl">Swap one item · ${x.m.name}</span><h2 class="h1" style="font-size:28px">Instead of ${esc(pp.it.name.toLowerCase())}</h2><p class="sub">${partText(pp)} · ${fmt(k0)} kcal · ${Math.round(p0)}g protein</p></div><button class="ib" style="background:var(--s2)" data-a="closeSheet" aria-label="Close">${ic('i-x')}</button></div>
+ ${out.length ? `<div class="in list">${out.map(c => { const dp = Math.round(c.p - p0), dk = Math.round(c.k - k0); return `<button class="li" data-a="iswapGo" data-v="${mealId}|${esc(key)}|${esc(c.it.name)}|${c.m}"><span class="tile" style="background:var(--s1)">${ic(itemIcon(c.it))}</span><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${esc(dispName(c.it))}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${qty(c.it.nut[4]*c.m, c.it.nut[5])} · ${stationsOf(c.it.name, mealId)[0]}</span></span><span style="text-align:right;line-height:1.35"><span class="n" style="display:block;font-size:17px;color:${dp>=0?'var(--lime)':'var(--t2)'}">${dp>=0?'+':''}${dp}g</span><span class="u" style="font-size:12px">${dk>=0?'+':''}${dk} kcal</span></span></button>`; }).join('')}</div>` : `<p class="sub">Nothing else in that category at ${x.m.name.toLowerCase()} fits your diet. Try a whole new meal instead.</p>`}
+ ${pp.from ? `<button class="ghost" data-a="iswapReset" data-v="${mealId}|${esc(key)}">Go back to ${esc(key.toLowerCase())}</button>` : ''}
+ <button class="ghost fill" data-a="never" data-v="${esc(pp.it.name)}|${mealId}" style="color:var(--garnet-t)">${ic('i-ban','width:18px;height:18px')}Never again</button>
+ <p class="note" style="margin:0">Portions are resized to keep calories and protein close. Your daily targets don't change. Never again removes it from every future plan.</p>`;
+}
+const aBadge = hits => hits.length ? `<span style="display:inline-flex;align-items:center;gap:4px;font:600 12px Inter,sans-serif;color:var(--red);background:rgba(255,90,90,.12);padding:3px 8px;border-radius:999px;margin-top:4px">${ic('i-alert','width:12px;height:12px')}Contains ${hits.join(', ')}</span>` : '';
+const ndBadge = () => `<span style="display:inline-block;font:600 12px Inter,sans-serif;color:var(--t2);background:#2C3036;padding:3px 8px;border-radius:999px;margin-top:4px">No allergen data</span>`;
+function needConfirm(a, v, hits){
+ if (!hits.length || (S.sheet && S.sheet.ok)) return false;
+ S.sheet.confirm = {a, v, hits}; render(true); return true;
+}
+function logResults(){
+ const q = (S.sheet.q || '').toLowerCase().trim(); const seen = new Map();
+ for (const id of ['sat-b','sat-l','sat-d']) for (const it of itemsFor(id)) if (!seen.has(it.name)) seen.set(it.name, {it, id});
+ const list = [...seen.values()].filter(o => !q || o.it.name.toLowerCase().includes(q)).slice(0, 40);
+ return list.length ? list.map(o => { const c = conflict(o.it); const n = o.it.nut; return `<button class="li" data-a="logMenu" data-v="${esc(o.it.name)}|${o.id}"><span class="tile" style="background:var(--s1)">${ic(itemIcon(o.it))}</span><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${esc(dispName(o.it))}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${qty(n[4], n[5])} · ${n[0]} kcal · ${n[1]}g protein</span>${(() => { const st = allergenState(o.it); const h = userHits(st.list, o.it.name); return h.length ? aBadge(h) : st.state === 'nodata' && (allergiesOf(S.p).length || otherOf(S.p)) ? ndBadge() : ''; })()}</span>${ic('i-plus','color:var(--t2)')}</button>`; }).join('') : `<p class="note" style="padding:16px;margin:0">Nothing on Saturday's menu matches. Try Custom.</p>`;
+}
+function sheetLog(){
+ const t = S.sheet.tab || 'quick'; const c = S.sheet.c || {};
+ if (S.sheet.confirm) { const h = S.sheet.confirm.hits;
+  return `<div class="g" style="gap:16px;padding-top:8px"><span style="width:56px;height:56px;border-radius:16px;background:rgba(255,90,90,.12);color:var(--red);display:flex;align-items:center;justify-content:center">${ic('i-alert','width:28px;height:28px')}</span>
+  <h2 class="h1" style="font-size:30px">This contains ${h.join(', ')}. Log anyway?</h2>
+  <p class="sub">Logging is fine if you already ate it. Hackro will never recommend it. Allergens for foods outside the Dining Center are Hackro estimates from the name.</p></div>
+  <div class="g" style="gap:4px"><button class="cta" data-a="logConfirm">Log anyway</button><button class="ghost" data-a="logCancel">Cancel</button></div>`; }
+ return `<div class="row sb" style="align-items:flex-start"><div class="g" style="gap:8px"><span class="lbl">Outside the plan</span><h2 class="h1" style="font-size:28px">What else did you eat?</h2></div><button class="ib" style="background:var(--s2)" data-a="closeSheet" aria-label="Close">${ic('i-x')}</button></div>
+ <div class="seg" style="grid-template-columns:repeat(3,1fr);background:var(--s2)">${[['quick','Quick add'],['menu','Dining Center'],['custom','Custom']].map(([k,l]) => `<button class="${t===k?'on':''}" style="${t===k?'background:#2C3036':''}" data-a="logTab" data-v="${k}">${l}</button>`).join('')}</div>
+ ${t === 'quick' ? `<div class="in list">${QUICK.map(([n,k,pr], i) => `<button class="li" data-a="logQuick" data-v="${i}"><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${n}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${k} kcal · ${pr}g protein</span>${aBadge(userHits(guessAllergens(n), n))}</span>${ic('i-plus','color:var(--t2)')}</button>`).join('')}</div>` : ''}
+ ${t === 'menu' ? `<input class="inp" style="background:var(--s2)" type="search" placeholder="Search Saturday's menu" aria-label="Search Saturday's menu" data-q="1" value="${esc(S.sheet.q || '')}"><div class="in list" id="logRes" style="max-height:44vh;overflow:auto">${logResults()}</div>` : ''}
+ ${t === 'custom' ? `<div class="g" style="gap:12px">
+  <label class="field"><span>What did you eat?</span><input class="inp" style="background:var(--s2)" data-cq="1" value="${esc(c.name||'')}" placeholder="e.g. 2 eggs, Wawa hoagie, iced latte" autocomplete="off"></label>
+  <div id="cSug">${customSug()}</div>
+  <div class="row sb"><span class="t2">Amount</span><div class="row" style="gap:8px"><button class="ib" style="width:36px;height:36px;background:var(--s2)" data-a="cGram" data-v="-25" aria-label="Less">${ic('i-minus','width:16px;height:16px')}</button><span id="cGram" class="n" style="font-size:20px;min-width:52px;text-align:center">${(+c.grams||100)} g</span><button class="ib" style="width:36px;height:36px;background:var(--s2)" data-a="cGram" data-v="25" aria-label="More">${ic('i-plus','width:16px;height:16px')}</button></div></div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">${[['k','kcal'],['p','Protein'],['c','Carbs'],['f','Fat']].map(([k,l]) => `<label class="field"><span>${l}</span><input id="c_${k}" class="inp" style="background:var(--s2);padding:0 10px" type="number" inputmode="numeric" min="0" data-c="${k}" value="${esc(c[k] ?? '')}" placeholder="0"></label>`).join('')}</div>
+  <p class="note" style="margin:0">Looked up from USDA FoodData Central (per 100g × amount). Edit any number if you know the label.</p>
+  <button class="cta" id="cAdd" data-a="logCustom" ${c.name && +c.k ? '' : 'disabled'}>Add to today</button></div>` : ''}
+ <p class="note" style="margin:0">Counts toward today's goals and streak. Quick-add values are Hackro estimates.</p>`;
+}
+function sheetFlex(){
+ const m = mealById(S.sheet.meal); const x = plan('sat').find(y => y.m.id === m.id); const f = S.sheet.f || {};
+ return `<div class="row sb" style="align-items:flex-start"><div class="g" style="gap:8px"><span class="lbl">Flex meal · ${m.name}</span><h2 class="h1" style="font-size:28px">Eating ${m.name.toLowerCase()} somewhere else?</h2><p class="sub">Log a rough guess and the rest of today rebalances around it. Flex meals never break your streak.</p></div><button class="ib" style="background:var(--s2)" data-a="closeSheet" aria-label="Close">${ic('i-x')}</button></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <label class="field"><span>About how many kcal</span><input class="inp" style="background:var(--s2)" type="number" inputmode="numeric" min="0" data-fx="k" value="${esc(f.k ?? '')}" placeholder="${fmt(x.tot.k)}"></label>
+  <label class="field"><span>Protein (g)</span><input class="inp" style="background:var(--s2)" type="number" inputmode="numeric" min="0" data-fx="p" value="${esc(f.p ?? '')}" placeholder="${Math.round(x.tot.p)}"></label>
+ </div>
+ <div class="g" style="gap:4px"><button class="cta" data-a="flexSave">Save flex meal</button><button class="ghost" data-a="flexSkip">Skip the numbers (assume what was planned)</button></div>`;
+}
+function sheetReward(){
+ const r = REWARDS[0]; const nx = REWARDS[1];
+ return `<div class="g" style="gap:20px;align-items:center;text-align:center;padding-top:8px">
+ <span style="width:112px;height:112px;border-radius:999px;background:rgba(255,148,50,.16);color:var(--orange);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px rgba(255,148,50,.06)">${ic(r[3],'width:52px;height:52px;stroke-width:1.5')}</span>
+ <div class="g" style="gap:8px"><span class="lbl" style="color:var(--orange)">Reward unlocked · 1 day streak</span><h2 class="h1" style="font-size:36px">${r[1]}</h2><p class="sub">You hit protein and landed calories in range. ${nx[1]} unlocks in ${nx[0]-1} more days.</p></div>
+ </div>
+ <div class="g" style="gap:4px"><button class="cta" data-a="seeRewards">See your rewards</button><button class="ghost" data-a="closeSheet">Keep going</button></div>`;
+}
+
+/* -------- App shell -------- */
+function tabs(){
+ const t = [['today','i-home','Today'],['plan','i-plan','Plan'],['dining','i-dining','Dining'],['goals','i-target','Goals'],['you','i-user','You']];
+ return `<nav class="tabs" aria-label="Tabs">${t.map(([k,i,l]) => `<button class="tab ${S.tab===k?'on':''}" data-a="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':''}>${ic(i)}${l}</button>`).join('')}</nav>`;
+}
+function topBack(label, right = '<span></span>'){
+ return `<div class="top"><button class="ib" data-a="back" aria-label="Back">${ic('i-back')}</button><span class="lbl">${label}</span>${right}</div>`;
+}
+
+function vToday(){
+ const {pct, e, T} = completion(); const nx = nextMeal(); const pl = plan('sat');
+ const left = pl.filter(x => !mealDone(x));
+ const pLeft = Math.max(0, Math.round(T.p - e.p));
+ const O = overInfo(); const trimmedMeals = pl.filter(x => x.trimmed); const adjMeals = pl.filter(x => x.trimmed || x.boosted);
+ const listNames = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length-1];
+ const head = O.over > 0 ? `${fmt(O.over)} kcal over today's target` : left.length ? `${pLeft}g protein to go across ${left.length} meal${left.length>1?'s':''}` : 'Every meal checked off. Day complete.';
+ const bkDone = pl.some(x => x.m.id === 'sat-b' && mealDone(x));
+ const sub = nx ? (nx.m.kind === 'snack' ? `Your snack is ${esc(title(nx.parts).toLowerCase())}${bkDone ? ', around 3:30 PM.' : ' from breakfast. Grab it before 11.'}` : `${nx.m.name} is open ${nx.m.hours}. Start with ${nx.parts[0] ? esc(nx.parts[0].it.name.replace(/ FZ$/,'').toLowerCase()) : 'what fits'}.`) : (left.length ? 'Check off anything you ate that is still open.' : 'Sunday brunch is ready in Plan.');
+ const sub2 = O.over > 0 ? (pLeft > 0 && nx ? `Still ${pLeft}g protein to go. ${listNames(trimmedMeals.map(x => x.m.name.toLowerCase()))||'The rest of today'} ${trimmedMeals.length>1?'are':'is'} cut down to the lean protein.` : `One day doesn't move your trend. Brunch tomorrow starts fresh.`) : adjMeals.length ? `Rebalanced around what you've actually eaten: ${listNames(adjMeals.map(x => `${x.m.name.toLowerCase()} ${x.deltaK > 0 ? '+' : '−'}${fmt(Math.abs(x.deltaK))} kcal`))}.` : sub;
+ const R = [['Calories', e.k, T.kcal, '#FFB020', '', '#E35D73'], ['Protein', e.p, T.p, '#B8F135', ' g'], ['Carbs', e.c, T.c, '#FF9432', ' g'], ['Fat', e.f, T.f, '#C9CED4', ' g']];
+ const devN = [fuel() != null, has('recovery'), has('recovery')].filter(Boolean).length;
+ const dev = S.device && !devN ? `<button class="card row" data-a="auth" data-v="whoop" style="width:100%;text-align:left"><span class="tile">${ic('i-band')}</span><span style="flex:1"><span style="display:block;font-weight:600">Whoop connected</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Share recovery to get a Fuel Score</span></span>${ic('i-chev','width:18px;height:18px;color:var(--t3)')}</button>`
+  : S.device
+  ? `<div style="display:grid;grid-template-columns:repeat(${devN},minmax(0,1fr));width:100%">
+    ${[fuel() != null && ['Fuel',fuel(),fuel(),'#B8F135','fuel'], has('recovery') && ['Recovery',WEAR.recovery+'<span style="font-size:13px">%</span>',WEAR.recovery,'#B8F135'], has('recovery') && ['Strain today',WEAR.strain,WEAR.strain/21*100,'#4DA3FF']].filter(Boolean).map(([l,v,pc,c,lnk]) => `<${lnk?'button data-a="open" data-v="fuel" aria-label="Fuel Score '+fuel()+'. Open breakdown"':'div'} class="g" style="align-items:center;gap:8px">${ring(64,5,pc,c,`<span class="n" style="font-size:21px">${v}</span>`)}<span class="lbl" style="font-size:12px">${l}</span></${lnk?'button':'div'}>`).join('')}
+   </div>`
+  : S.whoop === 'no' ? '' : `<button class="card row" data-a="go" data-v="connect" style="width:100%;text-align:left"><span class="tile">${ic('i-band')}</span><span style="flex:1"><span style="display:block;font-weight:600">Get your Fuel Score</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Connect Whoop and choose what it shares</span></span>${ic('i-chev','width:18px;height:18px;color:var(--t3)')}</button>`;
+ const nxAte = nx ? ateSet(nx.m.id) : new Set();
+ return `<div class="bd">
+ <header class="row sb"><span class="lbl">${DAYS.sat.label} · ${NOW.label}</span><button data-a="tab" data-v="you" aria-label="Profile" style="width:36px;height:36px;border-radius:999px;background:var(--s2);display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">${esc((S.p.name||'?')[0].toUpperCase())}</button></header>
+ <div class="g" style="gap:8px;margin-top:-16px"><h1 class="h1">${head}</h1><p class="sub">${sub2}</p></div>
+ <section class="g" style="gap:24px;align-items:center" aria-label="Day completion">
+  <div style="position:relative;width:248px;height:248px" role="img" aria-label="Eaten so far: ${R.map(r => `${r[0]} ${Math.round(r[1])} of ${Math.round(r[2])}`).join(', ')}">
+   ${concentric(R)}
+   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span class="n" style="font-size:46px">${fmt(e.k)}</span><span class="u" style="margin-top:2px">of ${fmt(T.kcal)} kcal</span>${O.over > 0 ? `<span class="lbl" style="font-size:12px;color:var(--garnet-t);margin-top:4px">${fmt(O.over)} over</span>` : ''}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%">
+   ${R.map(([l,v,max,c,u,oc]) => `<div><div class="row" style="gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:${c}"></span><span class="lbl" style="font-size:12px">${l}</span></div><div class="n" style="font-size:22px;margin-top:8px">${fmt(v)}</div>${oc && v > max ? `<div class="u" style="font-size:12px;margin-top:2px;color:var(--garnet-t)">+${fmt(v - max)} over</div>` : `<div class="u" style="font-size:12px;margin-top:2px">of ${fmt(max)}${u}</div>`}</div>`).join('')}
+  </div>
+  ${dev}
+ </section>
+ ${adjMeals.length ? `<section class="card g" style="gap:12px" aria-label="Plan rebalanced"><div class="row" style="gap:10px">${ic('i-sliders','color:var(--amber)')}<span style="flex:1;font-weight:600">Rest of today rebalanced</span><span class="u">target ${fmt(O.T.kcal)} kcal</span></div>
+  ${(() => { const pj = dayProjection(); return `<p class="t2" style="margin:0;font-size:13px">Day now lands at ${fmt(pj.t.k)} kcal and ${Math.round(pj.t.p)} g protein.${pj.msg ? ` <span style="color:var(--amber)">${pj.msg}</span>` : ''}</p>`; })()}
+  ${adjMeals.map(x => `<button class="row" data-a="open" data-v="meal:${x.m.id}" style="width:100%;text-align:left;font-size:14px"><span style="flex:1;min-width:0"><span style="font-weight:600">${x.m.name}</span><span class="t2">${x.removed && x.removed.length ? ` · drops ${esc(x.removed.map(n => n.replace(/ FZ$/,'').toLowerCase()).join(', '))}` : x.boosted ? ' · bigger portions' : ' · smaller portions'}</span></span><span class="n" style="font-size:17px;color:var(--amber)">${x.deltaK > 0 ? '+' : '−'}${fmt(Math.abs(x.deltaK))}</span><span class="u">&nbsp;kcal · ${x.deltaP >= 0 ? '+' : '−'}${Math.abs(Math.round(x.deltaP))} g P</span></button>`).join('')}</section>` : ''}
+ ${nx ? `<section class="card g" style="gap:16px" aria-label="Next meal">
+  <div class="row sb"><span class="lbl" style="color:var(--tx)">Next · ${nx.m.name} ${nx.m.kind==='snack'?'':nx.m.hours}</span><span class="t2" style="font-size:13px">${nx.m.kind==='snack'?'3:30 PM':'Dining Center'}</span></div>
+  <div class="g" style="gap:10px">${nx.parts.map(pp => { const on = nxAte.has(pp.it.name); return `<div class="row">${cbox(on, `data-a="eatItem" data-v="${nx.m.id}|${esc(pp.it.name)}"`, `${on?'Unmark':'Mark'} ${pp.it.name} as eaten`)}<button data-a="open" data-v="food:${esc(pp.it.name)}|${nx.m.id}" aria-label="Nutrition for ${esc(pp.it.name)}" style="flex:1;min-width:0;text-align:left;${on?'opacity:.55;text-decoration:line-through;text-decoration-color:var(--t3)':''}"><span class="row" style="gap:4px"><span>${esc(dispName(pp.it))}</span>${ic('i-chev','width:14px;height:14px;color:var(--t3)')}</span><span class="t2" style="display:block;font-size:12px;margin-top:1px">${partText(pp)} · ${fmt(pp.it.nut[0]*pp.m)} kcal · ${Math.round(pp.it.nut[1]*pp.m)}g protein${pp.from?' · swapped in':''}</span></button><button class="ib" style="width:36px;height:36px;background:var(--s2);color:var(--t2)" data-a="iswap" data-v="${nx.m.id}|${esc(pp.from || pp.it.name)}" aria-label="Swap ${esc(pp.it.name)}">${ic('i-swap','width:16px;height:16px')}</button></div>`; }).join('')}</div>
+  <div class="row" style="gap:28px"><div><span class="n" style="font-size:30px;color:var(--lime)">${Math.round(nx.tot.p)}</span><span class="u"> g protein</span></div><div><span class="n" style="font-size:30px">${fmt(nx.tot.k)}</span><span class="u"> kcal</span></div></div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:8px">${nxAte.size ? `<button class="cta inr" data-a="finish" data-v="${nx.m.id}">${ic('i-check')}Done · skip ${skipped(nx)}</button>` : `<button class="cta inr" data-a="eat" data-v="${nx.m.id}">${ic('i-check')}Ate it all</button>`}<button class="ghost fill" data-a="open" data-v="swap:${nx.m.id}">New meal</button></div>
+   ${plateWhy(nx)}
+  ${xcNote()}
+ </section>` : ''}
+ <section class="g" aria-label="Today's meals"><div class="row sb"><span class="lbl">Today's meals</span><span class="u">Check off what you ate</span></div>
+  <div class="card" style="padding:8px;display:flex;flex-direction:column;gap:2px">${pl.map(x => mealRow(x, {next: nx && nx.m.id === x.m.id})).join('')}<div style="padding:4px 12px 10px">${xcNote()}</div></div>
+ </section>
+ ${daySummary()}
+ <section class="g" aria-label="Logged outside the plan"><div class="row sb"><span class="lbl">Outside the plan</span>${S.extras.length?`<span class="u">${fmt(S.extras.reduce((a,e)=>a+e.k,0))} kcal · ${Math.round(S.extras.reduce((a,e)=>a+e.p,0))}g protein</span>`:''}</div>
+  ${S.extras.length ? `<div class="card list" style="padding:0">${S.extras.map((e, i) => `<div class="li"><span class="tile">${ic('i-plus')}</span><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${esc(e.name)}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${fmt(e.k)} kcal · ${Math.round(e.p)}g protein · ${esc(e.src)}</span>${aBadge(e.hits || [])}</span><button class="ib" style="width:36px;height:36px;background:var(--s2);color:var(--t2)" data-a="rmExtra" data-v="${i}" aria-label="Remove ${esc(e.name)}">${ic('i-x','width:16px;height:16px')}</button></div>`).join('')}</div>` : ''}
+  <button class="ghost fill" data-a="openLog">${ic('i-plus','width:18px;height:18px')}Log something else</button>
+ </section>
+ </div>`;
+}
+
+function vPlan(){
+ const day = S.planDay; const T = targets(); const pl = plan(day); const tot = dayTotals(day);
+ const nx = day === 'sat' ? nextMeal() : null;
+ return `<div class="bd">
+ <header class="row sb"><div class="row" style="gap:8px">${Object.entries(DAYS).map(([k,d]) => `<button class="chip ${day===k?'on':''}" data-a="planDay" data-v="${k}">${d.label}</button>`).join('')}</div></header>
+ <div class="g" style="gap:8px;margin-top:-16px"><h1 class="h1">${fmt(T.kcal)} kcal and ${T.p} g protein across ${pl.length} meals</h1><p class="sub">${day==='sat'?'All from Saturday\'s Dining Center menu.':'Sunday runs brunch, dinner and 5th Meal.'}</p></div>
+ <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+  <div><div class="n" style="font-size:34px">${fmt(tot.k)}</div><div class="lbl" style="margin-top:8px">kcal planned</div></div>
+  <div><div class="n" style="font-size:34px;color:var(--lime)">${Math.round(tot.p)}<span style="font-size:18px">g</span></div><div class="lbl" style="margin-top:8px">Protein planned</div></div>
+  <div><div class="n" style="font-size:34px">${(tot.k/T.kcal*100-100) >= 0 ? '+' : '−'}${Math.abs(tot.k/T.kcal*100-100).toFixed(0)}<span style="font-size:18px">%</span></div><div class="lbl" style="margin-top:8px">vs target</div></div>
+ </div>
+ ${(() => { const st = planStatus(day); return st.ok ? '' : `<p style="margin:-16px 0 0;font-size:14px;color:var(--amber)">${st.msg}</p>`; })()}
+ <section class="card" style="padding:8px;display:flex;flex-direction:column;gap:2px" aria-label="Meal timeline">${pl.map(x => mealRow(x, {next: nx && nx.m.id === x.m.id})).join('')}<div style="padding:4px 12px 10px">${xcNote()}</div></section>
+ <div class="g" style="gap:4px">
+  <button class="cta" data-a="regen" data-v="${day}">${ic('i-refresh')}Regenerate ${DAYS[day].short === 'Sat' ? 'Saturday' : 'Sunday'}</button>
+  <button class="ghost" data-a="open" data-v="goals">${ic('i-sliders','width:18px;height:18px')}Edit goals and diet</button>
+ </div>
+ <p class="note" style="margin:0;text-align:center">Calories and macros are Hackro estimates per serving.</p>
+ </div>`;
+}
+
+function vMeal(id){
+ const day = mealById(id).day; const x = plan(day).find(y => y.m.id === id);
+ if (isFlex(x)) { const fx = S.flex[id]; return `<div class="bd">
+  ${topBack(`${x.m.name} · flex`)}
+  <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">${x.m.name} was a flex meal</h1><p class="sub">${fx.est ? 'No numbers entered, so we assumed about what was planned.' : 'Logged from your estimate.'} The rest of today rebalanced around it, and your streak is safe.</p></div>
+  <div class="row" style="gap:24px">${donut({k:fx.k, p:fx.p, c:fx.c, f:fx.f})}${legend({p:fx.p, c:fx.c, f:fx.f})}</div>
+  <div class="g" style="gap:4px"><button class="cta" data-a="flex" data-v="${id}">Edit the estimate</button><button class="ghost" data-a="unflex" data-v="${id}">Undo flex</button></div>
+ </div>`; }
+ const ate = ateSet(id); const eaten = x.pick && mealDone(x); const canCheck = day === 'sat';
+ const eatT = sumParts(eatenParts(x)); const partial = (eaten || ate.size) && eatT.k < x.tot.k - 5;
+ const all = x.parts;
+ const sts = [...new Set(all.flatMap(pp => stationsOf(pp.it.name, id)))];
+ return `<div class="bd">
+ ${topBack(`${x.m.name} · ${x.m.kind==='snack'?'3:30 PM':x.m.hours}`)}
+ <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">${esc(title(x.parts))}</h1><p class="sub">${x.m.kind==='snack' ? (plan('sat').some(y => y.m.id === 'sat-b' && mealDone(y)) ? 'Around 3:30 PM, 2.5 hours before dinner.' : 'Take these to go from the Field of Greens at breakfast.') : `Dining Center · ${sts.join(', ')}`}</p>${partial ? `<p style="margin:4px 0 0;font-size:15px"><span class="n" style="font-size:22px">${fmt(eatT.k)}</span><span class="t2"> of ${fmt(x.tot.k)} planned kcal eaten · ${Math.round(eatT.p)} of ${Math.round(x.tot.p)} g protein</span></p>` : ''}</div>
+ <div class="row" style="gap:24px">${donut(x.tot)}${legend(x.tot)}</div>
+ ${x.removed && x.removed.length ? `<div class="card row" style="gap:10px;align-items:flex-start">${ic('i-sliders','color:var(--amber);margin-top:1px')}<div style="font-size:14px;line-height:1.5"><b style="font-weight:600">Trimmed to keep today in range.</b><span class="t2"> Dropped ${esc(x.removed.map(n => n.replace(/ FZ$/,'').toLowerCase()).join(', '))}${x.origK ? `, ${fmt(x.origK - x.tot.k)} kcal lighter` : ''}.</span></div></div>` : ''}
+ <section class="g" aria-label="Items"><div class="row sb"><span class="lbl">What's in it</span><span class="u">${canCheck ? 'Swap any item · check what you ate' : 'Swap any item'}</span></div>
+ <div class="card list" style="padding:0 16px">${all.map(pp => { const on = ate.has(pp.it.name); return `<div class="row" style="padding:14px 0">
+  <button class="tile" data-a="open" data-v="food:${esc(pp.it.name)}|${id}" aria-label="About ${esc(pp.it.name)}">${ic(itemIcon(pp.it))}</button>
+  <button style="flex:1;min-width:0;text-align:left" data-a="open" data-v="food:${esc(pp.it.name)}|${id}"><span style="display:block;font-weight:600">${esc(dispName(pp.it))}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${partText(pp)} · ${fmt(pp.it.nut[0]*pp.m)} kcal · ${Math.round(pp.it.nut[1]*pp.m)}g protein${pp.from ? `<span style="display:block;margin-top:2px;color:var(--t3)">Swapped in for ${esc(pp.from.toLowerCase())}</span>` : ''}${pp.orig && pp.m < pp.orig - 1e-6 ? `<span style="display:block;margin-top:2px;color:var(--amber)">Trimmed from ${qty(pp.it.nut[4]*pp.orig, pp.it.nut[5])}</span>` : ''}</span></button>
+  <button class="ib" style="width:36px;height:36px;background:var(--s2);color:var(--t2)" data-a="iswap" data-v="${id}|${esc(pp.from || pp.it.name)}" aria-label="Swap ${esc(pp.it.name)}">${ic('i-swap','width:16px;height:16px')}</button>
+  ${canCheck ? `<span style="padding-right:10px">${cbox(on, `data-a="eatItem" data-v="${id}|${esc(pp.it.name)}"`, `${on?'Unmark':'Mark'} ${pp.it.name} as eaten`)}</span>` : ''}
+ </div>`; }).join('')}</div></section>
+ ${xcNote()}
+ <div class="g" style="gap:4px">
+  ${day!=='sat' ? `<button class="cta" disabled>Available Sunday</button>` : eaten ? `<button class="cta" disabled>${ic('i-check')}Logged${skipped(x)?` · skipped ${skipped(x)}`:''}</button><button class="ghost" data-a="eatMeal" data-v="${id}">Undo</button>` : ate.size ? `<button class="cta" data-a="finish" data-v="${id}">${ic('i-check')}Done eating · skip ${skipped(x)}</button><button class="ghost" data-a="eat" data-v="${id}">I ate it all</button>` : `<button class="cta" data-a="eat" data-v="${id}">${ic('i-check')}Ate it all</button>`}
+  ${eaten ? '' : `<button class="ghost" data-a="open" data-v="swap:${id}">${ic('i-refresh','width:18px;height:18px')}Get a whole new meal</button>`}
+ </div>
+ </div>`;
+}
+
+function vSwap(id){
+ const m = mealById(id); const x = plan(m.day).find(y => y.m.id === id);
+ const cur = x.pick ? x.pick.main : '';
+ const alts = x.ranked.filter(r => r.main !== cur).slice(0, 3);
+ const sel = S.swapSel;
+ const match = r => Math.max(60, Math.min(99, Math.round(100 - r.err * 55)));
+ return `<div class="bd">
+ ${topBack(`Swap ${m.name.toLowerCase()}`)}
+ <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">${alts[0] ? `${esc(title(alts[0].parts).split(',')[0])} is a ${match(alts[0])}% match` : 'No other options fit today'}</h1>
+ <p class="sub">Replacing ${esc(title(x.parts).toLowerCase())} · <span class="n" style="font-size:17px;color:var(--tx)">${fmt(x.tot.k)}</span> kcal · <span class="n" style="font-size:17px;color:var(--tx)">${Math.round(x.tot.p)}</span>g protein</p></div>
+ <section class="g" aria-label="Options">${alts.map(r => `<button class="opt ${sel===r.main?'on':''}" data-a="swapSel" data-v="${esc(r.main)}" aria-pressed="${sel===r.main}" style="flex-direction:column;align-items:stretch;gap:14px">
+  <span class="row"><span class="tile">${ic(itemIcon(r.parts[0].it))}</span><span style="flex:1;min-width:0"><span style="display:block;font:600 16px/1.3 Inter,sans-serif;text-wrap:balance">${esc(title(r.parts))}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${[...new Set(r.parts.flatMap(pp => stationsOf(pp.it.name, id)))].join(', ')}</span></span><span style="text-align:right"><span class="n" style="display:block;font-size:26px;color:var(--lime)">${match(r)}%</span><span class="u">match</span></span></span>
+  <span style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--s2);border-radius:8px;padding:10px 12px">${[['kcal',fmt(r.t.k)],['protein',Math.round(r.t.p)+'g'],['carbs',Math.round(r.t.c)+'g'],['fat',Math.round(r.t.f)+'g']].map(([l,v]) => `<span><span class="n" style="display:block;font-size:18px">${v}</span><span class="u" style="font-size:12px">${l}</span></span>`).join('')}</span>
+ </button>`).join('')}</section>
+ <div class="g" style="gap:12px">
+  <button class="cta" data-a="swapGo" data-v="${id}" ${sel?'':'disabled'}>${sel ? 'Swap it in' : 'Pick a swap'}</button>
+  <p class="note" style="margin:0;text-align:center">Your daily target stays at ${fmt(targets().kcal)} kcal and ${targets().p}g protein.</p>
+ </div>
+ </div>`;
+}
+
+function vFood(arg){
+ const [name, mealId] = arg.split('|'); const it = findItem(name, mealId); const m = mealById(mealId);
+ const n = it.nut; const c = conflict(it); const tg = tagsText(it);
+ const t = n ? {k:n[0],p:n[1],c:n[2],f:n[3]} : null;
+ const score = n ? Math.max(20, Math.min(98, Math.round(n[1]*4/Math.max(n[0],1)*100*1.6 + (it.tags.has('vegan')||n[6]==='V'?10:0)))) : null;
+ return `<div class="bd">
+ ${topBack(`${m.name} · ${stationsOf(name, mealId).join(', ')}`)}
+ <div class="row" style="gap:16px;align-items:flex-start;margin-top:-8px"><span class="tile" style="width:64px;height:64px;border-radius:16px;background:var(--s1);color:var(--tx)">${ic(itemIcon(it),'width:30px;height:30px;stroke-width:1.5')}</span>
+  <div class="g" style="gap:8px"><h1 class="h1">${esc(dispName(it))}</h1><p class="sub">${n ? `${n[1]}g protein for ${n[0]} kcal per ${qty(n[4], n[5])}` : 'Nutrition estimate not available'}</p></div></div>
+ ${c ? `<div class="card row" style="gap:10px;background:rgba(255,90,90,.1)">${ic('i-alert','color:var(--red)')}<span style="flex:1;font-weight:600" class="warn">${c}</span><span class="t2" style="font-size:13px">Hidden from your plan</span></div>` : ''}
+ ${t ? `<div class="row" style="gap:24px">${donut(t)}${legend(t)}</div>` : ''}
+ ${n && n[0] ? `<div class="card row" style="gap:16px"><div class="n" style="font-size:44px;color:var(--lime)">${(n[1]/n[0]*100).toFixed(1)}<span style="font-size:18px"> g</span></div><div><div class="lbl">Protein per 100 kcal</div><div class="t2" style="font-size:13px;margin-top:6px">${n[1]/n[0]*100 >= 8 ? 'High: a strong pick for protein targets' : n[1]/n[0]*100 >= 4 ? 'Moderate' : 'Low: mostly carbs or fat'}</div></div></div>` : ''}
+ <section class="g" aria-label="Labels"><span class="lbl">Dining Center labels</span>
+  <div class="card list" style="padding:0 16px">
+   ${(() => { const st = allergenState(it); return st.state === 'contains'
+     ? `<div class="row" style="padding:14px 0;align-items:flex-start">${ic('i-alert','color:var(--red);margin-top:1px')}<span style="flex:1"><span style="display:block;font-weight:600" class="warn">Contains: ${st.list.map(aName).join(', ')}</span></span></div>`
+     : st.state === 'none'
+     ? `<div class="row" style="padding:14px 0;align-items:flex-start">${ic('i-shield','color:var(--green);margin-top:1px')}<span style="flex:1;font-weight:600" class="ok">Labeled: none of the major allergens</span></div>`
+     : `<div class="row" style="padding:14px 0;align-items:flex-start">${ic('i-info','color:var(--t3);margin-top:1px')}<span style="flex:1"><span style="display:block;font-weight:600;color:var(--t2)">No allergen data</span><span class="t3" style="display:block;font-size:13px;margin-top:2px">Dining Services didn't label this item${allergiesOf(S.p).length || otherOf(S.p) ? ', so it\'s left out of your plan' : ''}.</span></span></div>`; })()}
+   <div class="row" style="padding:14px 0;align-items:flex-start"><span class="t2" style="width:96px;flex:none">Diet</span><span style="flex:1">${tg.diet.length ? tg.diet.join(', ') : '—'}</span></div>
+   ${c ? `<div class="row" style="padding:14px 0">${ic('i-alert','color:var(--red)')}<span style="flex:1;font-weight:600" class="warn">${c}</span></div>` : allergenState(it).state !== 'nodata' ? `<div class="row" style="padding:14px 0">${ic('i-check','color:var(--green)')}<span style="flex:1;font-weight:600" class="ok">Fits your diet and allergies</span></div>` : ''}
+  </div></section>
+ ${(() => { const up = m.day === NOW.day && plan(m.day).some(y => y.m.id === mealId && isUp(y)); const inPlan = plan(m.day).some(y => y.m.id === mealId && y.parts.some(pp => pp.it.name === name)); const block = c && c !== 'Not labeled gluten-free' ? c : c;
+   return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${!c && up && !inPlan ? `<button class="cta inr" style="border-radius:16px" data-a="addToPlan" data-v="${esc(name)}|${mealId}">${ic('i-plus')}Add to plan</button>` : `<button class="cta inr" style="border-radius:16px" disabled>${inPlan ? 'In your plan' : c ? 'Not recommended' : 'Add to plan'}</button>`}${m.day === NOW.day ? `<button class="ghost fill" data-a="logThis" data-v="${esc(name)}|${mealId}">Log this</button>` : `<button class="ghost fill" disabled style="color:var(--t3)">Log on ${DAYS[m.day].short}</button>`}</div>
+   ${isNever(name) ? `<button class="ghost" data-a="unnever" data-v="${esc(name)}">${ic('i-refresh','width:18px;height:18px')}Bring it back to your plans</button>` : `<button class="ghost" data-a="never" data-v="${esc(name)}|${mealId}" style="color:var(--garnet-t)">${ic('i-ban','width:18px;height:18px')}Never again</button>`}`; })()}
+ <section class="g" aria-label="Where"><span class="lbl">Where to get it</span>
+  <div class="card row"><span class="tile">${ic('i-building')}</span><div style="flex:1"><div style="font-weight:600">Dining Center · ${stationsOf(name, mealId).join(', ')}</div><div class="t2" style="font-size:13px;margin-top:2px">${DAYS[m.day].label} · ${m.kind==='snack'?'breakfast':m.name.toLowerCase()} ${m.kind==='snack'?mealById('sat-b').hours:m.hours}</div></div></div>
+ </section>
+ ${xcNote()}
+ <p class="note" style="margin:0">Nutrition is a Hackro estimate per serving; check NetNutrition for official values.</p>
+ </div>`;
+}
+
+function vFuel(){
+ const f = fuel(); const rc = has('recovery');
+ const parts = [rc && ['Recovery', `Recovery ${WEAR.recovery}% · strain today ${WEAR.strain}`, f, WEAR.recovery, '#B8F135']].filter(Boolean);
+ const lead = parts.slice().sort((a, b) => b[2] - a[2])[0];
+ return `<div class="bd">
+ ${topBack(`Fuel score · ${DAYS.sat.label}`)}
+ <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">${parts.length > 1 ? `${lead[0]} earned ${lead[2]} of your ${f} points` : `${lead[0]} sets your score today`}</h1><p class="sub">Synced from Whoop this morning.</p></div>
+ <div class="row" style="justify-content:center">${ring(200, 14, f, '#B8F135', `<span class="n" style="font-size:80px">${f}</span><span style="font:600 14px Inter,sans-serif;color:var(--lime);margin-top:4px">Optimal</span>`)}</div>
+ <section class="g" aria-label="Contributors"><div class="row sb"><span class="lbl">What built it</span><span class="u">points</span></div>
+ <div class="card list" style="padding:0 16px">
+  ${parts.map(([l,d,pt,pc,c]) => `<div class="g" style="gap:10px;padding:16px 0"><div class="row sb" style="align-items:flex-start"><div><div style="font-weight:600">${l}</div><div class="t2" style="font-size:13px;margin-top:2px">${d}</div></div><span class="n" style="font-size:28px;color:${c}">+${pt}</span></div><div class="tr"><div class="fl" style="width:${pc}%;background:${c}"></div></div></div>`).join('')}
+ </div></section>
+ ${rc ? `<section class="g" aria-label="Today's adjustment"><span class="lbl">Today's adjustment</span>
+  <div class="card row" style="align-items:flex-start">${ic('i-trend','color:var(--t2);margin-top:1px')}<div style="font-size:14px;line-height:1.5"><b style="font-weight:600">+150 kcal, mostly carbs.</b><span class="t2"> High strain today (${WEAR.strain}) and good recovery.</span></div></div>
+ </section>` : ''}
+ <button class="cta" data-a="tab" data-v="plan">See today's plan</button>
+ </div>`;
+}
+
+function vDining(){
+ const mid = S.dineMeal; const m = mealById(mid); const f = S.dineFilter === 'fits' || S.dineFilter === 'all' ? null : S.dineFilter; const fitsOn = S.dineFits !== false;
+ const sts = menuFor(mid);
+ const pass = it => {
+  if (!it.nut) return false;
+  if (fitsOn && !fits(it)) return false;
+  if (!f) return true;
+  if (f === 'protein') return it.nut && it.nut[1] >= 15;
+  if (f === 'vegan') return it.tags.has('vegan');
+  if (f === 'gf') return it.tags.has('gluten free');
+  if (f === 'halal') return it.tags.has('halal');
+  return true;
+ };
+ const isOpen = m.day === NOW.day && NOW.mins >= m.start && NOW.mins < m.end;
+ const count = sts.reduce((a, s) => a + s.items.filter(i => i.nut && fits(i)).length, 0);
+ return `<div class="bd">
+ <header class="row sb"><span class="lbl">Dining · Swarthmore</span><span class="row" style="gap:6px;font-size:13px;color:var(--green)"><span style="width:8px;height:8px;border-radius:999px;background:var(--green)"></span>Breakfast until 11 AM</span></header>
+ <div class="g" style="gap:8px;margin-top:-16px"><h1 class="h1">${count} items at ${m.name.toLowerCase()} fit your plan</h1><p class="sub">Dining Center · ${DAYS[m.day].label} · ${m.hours}${isOpen?' · open now':''}</p></div>
+ <div class="g" style="gap:12px;margin-top:-8px">
+  <div class="scrollx">${MEALS.filter(x => x.kind !== 'snack').map(x => `<button class="chip ${mid===x.id?'on':''}" data-a="dineMeal" data-v="${x.id}">${DAYS[x.day].short} ${x.name}</button>`).join('')}</div>
+  <div class="scrollx"><button class="chip ${fitsOn?'on':''}" style="${fitsOn?'':'background:transparent;box-shadow:inset 0 0 0 1px var(--line)'}" data-a="dineFits" aria-pressed="${fitsOn}">Fits me</button>${[['protein','15g+ protein'],['vegan','Vegan'],['gf','Gluten-free'],['halal','Halal']].map(([k,l]) => `<button class="chip ${f===k?'on':''}" style="${f===k?'':'background:transparent;box-shadow:inset 0 0 0 1px var(--line)'}" data-a="dineFilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join('')}</div>
+ </div>
+ ${sts.map(s => { const theme = s.items.find(i => i.theme); const its = s.items.filter(i => !i.theme && pass(i)); if (!its.length) return ''; return `<section class="g" aria-label="${esc(s.station)}">
+  <div class="row sb"><span class="lbl">${esc(s.station)}</span>${theme?`<span class="u">${esc(theme.name)}</span>`:''}</div>
+  <div class="card list" style="padding:0">${its.map(it => { const c = conflict(it); return `<button class="li" data-a="open" data-v="food:${esc(it.name)}|${mid}" style="${c?'opacity:.55':''}">
+   <span class="tile">${ic(itemIcon(it))}</span>
+   <span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${esc(dispName(it))}</span><span style="display:block;font-size:13px;margin-top:2px" class="${c?'warn':'t2'}">${c ? c : (tagsText(it).diet.join(' · ') || (it.nut ? qty(it.nut[4], it.nut[5]) : ''))}</span></span>
+   ${it.nut ? `<span style="text-align:right;line-height:1.3"><span class="n" style="display:block;font-size:18px;${it.nut[1]>=15?'color:var(--lime)':''}">${it.nut[1]}g</span><span class="u" style="font-size:12px">${it.nut[0]} kcal</span></span>` : ''}
+  </button>`; }).join('')}</div></section>`; }).join('')}
+ <section class="g" aria-label="Other locations"><span class="lbl">Other campus spots</span>
+  <div class="card list" style="padding:0">${VENUES.map(v => `<div class="li" style="${v.open?'':'opacity:.6'}"><span class="tile">${ic(v.icon)}</span><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${v.name}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${v.d}</span></span><span style="font-size:12px;text-align:right;max-width:110px;color:${v.open?'var(--green)':'var(--t3)'}">${v.status}</span></div>`).join('')}</div>
+  <p class="note" style="margin:0">Only the Dining Center publishes itemized menus. Hours from Swarthmore Dining.</p>
+ </section>
+ </div>`;
+}
+
+function vTrack(){
+ const {e, T} = completion(); const hit = todayHit(); const streak = hit ? 1 : 0; const pl = plan('sat');
+ const O = overInfo(); const freezes = 0; /* streak freezes unlock at day 3; none earned yet in this demo */
+ const logged = pl.filter(mealDone).length; const p = S.p;
+ const goals = [
+  ['Protein', `${Math.round(e.p)} / ${T.p} g`, e.p / (T.p*0.9), e.p >= T.p*0.9, '#B8F135', `At least ${Math.round(T.p*0.9)} g`],
+  ['Calories in range', `${fmt(e.k)} / ${fmt(T.kcal)}`, O.overRange ? 1 : e.k / O.lo, e.k >= O.lo && e.k <= O.hi, O.overRange ? '#E35D73' : '#FFB020', O.overRange ? `<span style="color:var(--garnet-t)">Over by ${fmt(e.k - O.hi)} · range ends at ${fmt(O.hi)}</span>` : `${fmt(O.lo)}–${fmt(O.hi)} kcal for a ${GOALS[p.goal].label.toLowerCase()}`],
+  ['Check off every meal', `${logged} / ${pl.length}`, logged / pl.length, logged === pl.length, '#F5F6F7', 'Bonus, not needed for the streak']
+ ];
+ const toGo = goals.slice(0, 2).filter(g => !g[3]).length;
+ const pace = {build:'+0.25 to 0.75 lb a week', cut:'−0.5 to 1 lb a week', maintain:'Within 1 lb of today', perform:'Hold weight, fuel every session'}[p.goal];
+ const week = [['Mon',9],['Tue',10],['Wed',11],['Thu',12],['Fri',13],['Sat',14],['Sun',15]];
+ return `<div class="bd">
+ <header class="row sb"><span class="lbl">Goals · ${GOALS[p.goal].label}</span><button data-a="open" data-v="goals" style="height:36px;color:var(--garnet-t);font:600 14px Inter,sans-serif">Edit</button></header>
+ <div class="g" style="gap:8px;margin-top:-16px"><h1 class="h1">${O.overRange ? `Over your ${GOALS[p.goal].label.toLowerCase()} range today` : hit ? 'Day hit. Your streak has started' : `${toGo} goal${toGo>1?'s':''} left to start your streak`}</h1><p class="sub">${O.overRange ? (freezes ? 'A streak freeze will cover today, so your streak is safe.' : `No streak freeze yet (they unlock at day 3), so today won't count. Protein still matters: keep logging.`) : `A day counts when you hit protein and land between ${fmt(O.lo)} and ${fmt(O.hi)} kcal.`}</p></div>
+ <section class="card g" style="gap:20px" aria-label="Streak">
+  <div class="row" style="gap:16px">
+   <span style="width:64px;height:64px;border-radius:16px;background:${streak?'rgba(255,148,50,.14)':'var(--s2)'};color:${streak?'var(--orange)':'var(--t3)'};display:flex;align-items:center;justify-content:center;flex:none">${ic('i-flame','width:32px;height:32px;stroke-width:1.5')}</span>
+   <div style="flex:1"><div><span class="n" style="font-size:56px">${streak}</span><span class="u" style="font-size:15px"> day streak</span></div><div class="t2" style="font-size:13px;margin-top:4px">Best ${streak} · started tracking today</div></div>
+  </div>
+  ${(() => { const nr = REWARDS.find(r => r[0] > streak); const prev = [...REWARDS].reverse().find(r => r[0] <= streak); const base = prev ? prev[0] : 0; return nr ? `<div class="g" style="gap:8px"><div class="row sb" style="font-size:14px"><span><span class="t2">Next reward </span><b style="font-weight:600">${nr[1]}</b></span><span class="u">${nr[0]-streak} day${nr[0]-streak>1?'s':''} to go</span></div><div class="tr" style="height:6px"><div class="fl" style="width:${((streak-base)/(nr[0]-base)*100).toFixed(0)}%;background:var(--orange)"></div></div></div>` : ''; })()}
+  <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center">
+   ${week.map(([d, n]) => { const today = n === 14, past = n < 14; const bg = today ? (hit ? 'var(--orange)' : 'transparent') : 'transparent'; const ring = today ? (hit ? 'var(--orange)' : O.overRange ? 'var(--garnet-t)' : 'var(--tx)') : past ? 'transparent' : 'var(--line)';
+    return `<div class="g" style="gap:8px;align-items:center"><span class="lbl" style="font-size:12px;${today?'color:var(--tx)':''}">${d}</span><span style="width:36px;height:36px;border-radius:999px;background:${past?'var(--s2)':bg};box-shadow:inset 0 0 0 1.5px ${ring};display:flex;align-items:center;justify-content:center;color:${today&&hit?'#08090A':'var(--t3)'}">${today && hit ? ic('i-check','width:16px;height:16px;stroke-width:3') : `<span class="n" style="font-size:15px;color:${today?'var(--tx)':past?'#5A6068':'var(--t3)'}">${n}</span>`}</span></div>`; }).join('')}
+  </div>
+ </section>
+ <section class="g" aria-label="Today's goals"><div class="row sb"><span class="lbl">Today's goals</span><span class="u">${goals.filter(g => g[3]).length} of ${goals.length} done</span></div>
+  <div class="card list" style="padding:0 16px">${goals.map(([l, v, pr, ok, c, d]) => `<div class="g" style="gap:10px;padding:16px 0">
+   <div class="row"><span style="width:24px;height:24px;border-radius:999px;flex:none;display:flex;align-items:center;justify-content:center;background:${ok?'var(--lime)':'transparent'};box-shadow:inset 0 0 0 1.5px ${ok?'var(--lime)':'#5A6068'};color:#08090A">${ok?ic('i-check','width:14px;height:14px;stroke-width:3'):''}</span><span style="flex:1"><span style="display:block;font-weight:600">${l}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${d}</span></span><span class="n" style="font-size:18px">${v}</span></div>
+   <div class="tr"><div class="fl" style="width:${Math.min(100, pr*100).toFixed(1)}%;background:${c}"></div></div></div>`).join('')}</div>
+  ${!hit ? `<button class="cta" data-a="tab" data-v="today">${ic('i-check')}Check off a meal</button>` : ''}
+ </section>
+ <section class="g" aria-label="Weekly report"><span class="lbl">Weekly report</span>
+  <button class="card row" data-a="open" data-v="week" style="width:100%;text-align:left"><span class="tile">${ic('i-trend')}</span><span style="flex:1"><span style="display:block;font-weight:600">This week, Nov 9–15</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Protein, calories and streak, written up by Claude</span></span>${ic('i-chev','width:18px;height:18px;color:var(--t3)')}</button>
+ </section>
+ <section class="g" aria-label="Streak rewards"><div class="row sb"><span class="lbl">Streak rewards</span><span class="u">${REWARDS.filter(r => r[0] <= streak).length} of ${REWARDS.length} unlocked</span></div>
+  <div class="card list" style="padding:0">${REWARDS.map(([d, n, desc, icn]) => { const got = streak >= d; return `<div class="li" style="${got?'':'opacity:.7'}"><span class="tile" style="${got?'background:rgba(255,148,50,.16);color:var(--orange)':''}">${ic(icn)}</span><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${n}</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">${desc}</span></span>${got ? `<span class="row" style="gap:4px;font-size:13px;font-weight:600;color:var(--orange)">${ic('i-check','width:14px;height:14px;stroke-width:2.75')}Unlocked</span>` : `<span class="u">Day ${d}</span>`}</div>`; }).join('')}</div>
+ </section>
+ <section class="g" aria-label="This week"><span class="lbl">This week</span>
+  <div class="card g" style="gap:12px"><div class="row sb"><span style="font-weight:600">Hit 5 of 7 days</span><span><span class="n" style="font-size:22px">${streak}</span><span class="u"> / 5</span></span></div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px">${[0,1,2,3,4].map(i => `<span style="height:6px;border-radius:999px;background:${i < streak ? 'var(--orange)' : 'var(--line)'}"></span>`).join('')}</div></div>
+ </section>
+ <section class="g" aria-label="Body goal"><span class="lbl">Body goal</span>
+  ${(() => { const g = p.bodyGoal; const gp = goalPlan(g); if (!gp || gp.same) return `<div class="card g" style="gap:14px"><div class="row"><span class="tile">${ic('i-trend')}</span><span style="flex:1"><span style="display:block;font-weight:600">${GOALS[p.goal].label} · ${p.lb} lb</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Target pace ${pace}</span></span></div><button class="cta inr" data-a="open" data-v="bodygoal">Set a goal</button></div>`;
+   const next = gp.ms[0];
+   return `<div class="card g" style="gap:14px">
+    <div class="row sb"><div><div class="n" style="font-size:30px">${gp.cur} → ${gp.tgt}<span class="u"> lb</span></div><div class="t2" style="font-size:13px;margin-top:4px">By ${fmtDate(gp.end)} · ${gp.rate.toFixed(1)} lb a week · ${gp.weeks} weeks</div></div><button data-a="open" data-v="goals" style="height:36px;color:var(--garnet-t);font:600 14px Inter,sans-serif">Edit</button></div>
+    <div class="tr" style="height:6px"><div class="fl" style="width:2%;background:var(--lime)"></div></div>
+    <div class="row sb" style="font-size:14px"><span class="t2">Next milestone · ${fmtDate(next.date)}</span><span class="n" style="font-size:18px">${next.lb.toFixed(1)} lb</span></div>
+    ${gp.why ? `<p style="margin:0;font-size:13px;line-height:1.5;color:var(--amber)">${gp.why}</p>` : ''}
+    <div style="font-size:14px;line-height:1.5"><div style="margin-bottom:4px">${aiTag(g.edits ? 'Claude · Haiku' : 'Claude · Sonnet')}</div><span class="t2">${goalText(g, g.edits ? 'haiku' : 'sonnet')}</span></div>
+   </div>`; })()}
+ </section>
+ ${!S.device && S.whoop === 'no' ? '' : `<section class="g" aria-label="Training"><span class="lbl">Training today</span>
+  ${S.device ? (has('recovery') ? `<div class="card list" style="padding:0">
+   <div class="li"><span class="tile">${ic('i-bolt')}</span><span style="flex:1"><span style="display:block;font-weight:600">Strain today</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">High · targets raised 150 kcal, mostly carbs</span></span><span class="n" style="font-size:22px;color:var(--blue)">${WEAR.strain}</span></div>
+  </div>` : `<button class="card row" data-a="auth" data-v="whoop" style="width:100%;text-align:left"><span class="tile">${ic('i-band')}</span><span style="flex:1"><span style="display:block;font-weight:600">Strain is off</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Share strain and recovery from Whoop</span></span>${ic('i-chev','width:18px;height:18px;color:var(--t3)')}</button>`) : `<button class="card row" data-a="go" data-v="connect" style="width:100%;text-align:left"><span class="tile">${ic('i-band')}</span><span style="flex:1"><span style="display:block;font-weight:600">Connect Whoop</span><span class="t2" style="display:block;font-size:13px;margin-top:2px">Track workouts and strain next to your food goals</span></span>${ic('i-chev','width:18px;height:18px;color:var(--t3)')}</button>`}
+ </section>`}
+ </div>`;
+}
+
+/* ---- Body-goal plan builder: rate capped at 1% of body weight a week (0.5% for cuts when BMI < 20) ---- */
+const TODAY = new Date(2026, 10, 14);
+const fmtDate = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric', year: d.getFullYear() !== 2026 ? 'numeric' : undefined});
+const isoDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function goalPlan(g, p = S.p){
+ if (!g || !(+g.target > 0) || !g.date) return null;
+ const cur = +p.lb, tgt = +g.target, diff = tgt - cur; if (Math.abs(diff) < 0.5) return {same: true, cur, tgt};
+ const parts = String(g.date).split('-').map(Number); const want = new Date(parts[0], parts[1]-1, parts[2]);
+ const weeksWanted = Math.max(1, Math.round((want - TODAY) / (7 * 864e5)));
+ const kg = cur * 0.4536, mtr = (p.ft*12 + (+p.inch)) * 0.0254, bmi = kg / (mtr*mtr);
+ const lowBmiCut = diff < 0 && bmi < 20; const capPct = lowBmiCut ? 0.005 : 0.01; const cap = cur * capPct;
+ const rateWanted = Math.abs(diff) / weeksWanted; const extended = rateWanted > cap + 1e-9;
+ const weeks = extended ? Math.ceil(Math.abs(diff) / cap) : weeksWanted; const rate = Math.abs(diff) / weeks;
+ const end = new Date(TODAY.getTime() + weeks * 7 * 864e5);
+ const every = Math.max(1, Math.ceil(weeks / 8)); const ms = [];
+ for (let w = every; w < weeks; w += every) ms.push({w, date: new Date(TODAY.getTime() + w*7*864e5), lb: cur + diff * w / weeks});
+ ms.push({w: weeks, date: end, lb: tgt});
+ const dir = diff > 0 ? 'gain' : 'loss';
+ const why = extended ? `${fmtDate(want)} would take ${rateWanted.toFixed(1)} lb a week. We cap ${dir} at ${(capPct*100).toFixed(capPct < 0.01 ? 1 : 0)}% of body weight (${cap.toFixed(1)} lb a week)${lowBmiCut ? ' because your BMI is under 20' : ''}, so the plan ends ${fmtDate(end)} instead.` : '';
+ const mismatch = (p.goal === 'cut' && diff > 0) ? 'Your goal is a cut, but this target is a gain.' : (p.goal === 'build' && diff < 0) ? `Your goal is a ${GOALS[p.goal].label.toLowerCase()}, but this target is a loss.` : '';
+ return {cur, tgt, diff, weeks, weeksWanted, want, extended, rate, cap, capPct, bmi, end, ms, why, mismatch, dir};
+}
+function goalPreview(g){
+ const gp = goalPlan(g);
+ if (!gp) return `<p class="note" style="margin:0">Enter a target weight and date to see the plan.</p>`;
+ if (gp.same) return `<p class="note" style="margin:0">That's your current weight. Pick a different target, or use Maintain.</p>`;
+ return `<div class="g" style="gap:12px">
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+   <div><div class="n" style="font-size:26px">${gp.diff > 0 ? '+' : '−'}${Math.abs(gp.diff).toFixed(1)}</div><div class="lbl" style="margin-top:6px;font-size:12px">lb total</div></div>
+   <div><div class="n" style="font-size:26px">${gp.rate.toFixed(2)}</div><div class="lbl" style="margin-top:6px;font-size:12px">lb / week</div></div>
+   <div><div class="n" style="font-size:26px">${gp.weeks}</div><div class="lbl" style="margin-top:6px;font-size:12px">weeks</div></div>
+  </div>
+  ${gp.why ? `<p style="margin:0;font-size:14px;line-height:1.5;color:var(--amber)">${gp.why}</p>` : ''}
+  ${gp.mismatch ? `<p style="margin:0;font-size:14px;color:var(--garnet-t)">${gp.mismatch} Change the target or your goal in Edit goals and diet.</p>` : ''}
+  <div class="card list" style="padding:0 16px;background:var(--s2)">${gp.ms.map(m => `<div class="row sb" style="padding:10px 0;font-size:14px"><span class="t2">Week ${m.w} · ${fmtDate(m.date)}</span><span class="n" style="font-size:17px">${m.lb.toFixed(1)} lb</span></div>`).join('')}</div>
+ </div>`;
+}
+function goalText(g, model){
+ const gp = goalPlan(g); if (!gp || gp.same) return '';
+ const fb = `${gp.dir === 'gain' ? 'Gain' : 'Lose'} about ${gp.rate.toFixed(1)} lb a week to go from ${gp.cur} to ${gp.tgt} lb by ${fmtDate(gp.end)}.${gp.extended ? ` That's later than ${fmtDate(gp.want)} so the pace stays under ${(gp.capPct*100).toFixed(gp.capPct < 0.01 ? 1 : 0)}% of body weight a week.` : ' That pace is within the safe range.'}`;
+ const data = {current_lb: gp.cur, target_lb: gp.tgt, requested_date: fmtDate(gp.want), plan_end_date: fmtDate(gp.end), weeks: gp.weeks, lb_per_week: +gp.rate.toFixed(2), weekly_cap_pct_body_weight: gp.capPct*100, date_extended: gp.extended, low_bmi_cut_rule: gp.capPct < 0.01, goal: GOALS[S.p.goal].label};
+ return aiText('goal_plan', data, fb, model);
+}
+function vBodyGoal(){
+ const g = S.bgDraft || (S.bgDraft = {target: '', date: isoDate(new Date(TODAY.getTime() + 12*7*864e5))});
+ return `<div class="bd">
+ ${topBack('Set a goal')}
+ <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">Where do you want to be, and by when?</h1><p class="sub">We'll build weekly milestones and keep the pace safe: at most 1% of body weight a week.</p></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+  <label class="field"><span>Target weight</span><div class="row" style="height:52px;border-radius:16px;background:var(--s1);padding:0 16px;gap:8px"><input class="inp" style="background:transparent;padding:0;height:50px;flex:1;min-width:0;box-shadow:none" type="number" inputmode="decimal" data-bg="target" value="${esc(g.target)}" placeholder="${S.p.lb}"><span class="u">lb</span></div></label>
+  <label class="field"><span>Target date</span><input class="inp" type="date" data-bg="date" min="${isoDate(new Date(TODAY.getTime() + 7*864e5))}" value="${esc(g.date)}"></label>
+ </div>
+ <div id="bgPrev">${goalPreview(g)}</div>
+ <button class="cta" data-a="saveBodyGoal">Save goal</button>
+ </div>`;
+}
+
+function vWeek(){
+ const {e, T} = completion(); const hit = todayHit(); const pl = plan('sat'); const logged = pl.filter(mealDone).length;
+ const data = {days_tracked: 1, week: 'Nov 9-15', today_protein_g: Math.round(e.p), protein_target_g: T.p, today_kcal: Math.round(e.k), kcal_target: T.kcal, meals_logged: logged, meals_planned: pl.length, day_counted_for_streak: hit, streak_days: hit ? 1 : 0, goal: GOALS[S.p.goal].label};
+ const fb = `Week one, day one: ${Math.round(e.p)} of ${T.p} g protein and ${fmt(e.k)} of ${fmt(T.kcal)} kcal so far, ${logged} of ${pl.length} meals logged. ${hit ? 'Today already counts toward your streak.' : 'Hit protein and land in range to start your streak.'} Next week's report compares day to day once there's more than one day logged.`;
+ return `<div class="bd">
+ ${topBack('Weekly report · Nov 9–15')}
+ <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">Your first week starts today</h1><p class="sub">Free for everyone, every Sunday night.</p></div>
+ <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+  <div><div class="n" style="font-size:32px">1</div><div class="lbl" style="margin-top:8px">Days tracked</div></div>
+  <div><div class="n" style="font-size:32px;color:var(--lime)">${Math.round(e.p)}<span style="font-size:16px"> g</span></div><div class="lbl" style="margin-top:8px">Avg protein</div></div>
+  <div><div class="n" style="font-size:32px">${hit ? 1 : 0}</div><div class="lbl" style="margin-top:8px">Days hit</div></div>
+ </div>
+ <section class="card g" style="gap:10px">${aiTag()}<p style="margin:0;line-height:1.55">${aiText('weekly_report', data, fb)}</p></section>
+ </div>`;
+}
+
+function vYou(){
+ const T = targets(); const p = S.p;
+ const plans = {swat:'Swat Plan · unlimited', garnet:'Garnet Plan', none:'No meal plan'};
+ return `<div class="bd">
+ <header class="row" style="gap:16px;margin-top:12px"><div style="width:64px;height:64px;border-radius:999px;background:var(--s2);display:flex;align-items:center;justify-content:center;font:600 26px Inter,sans-serif;flex:none">${esc((p.name||'?')[0].toUpperCase())}</div>
+ <div style="flex:1"><h1 class="h1" style="font-size:32px">${esc(p.name||'You')}</h1><div class="t2" style="font-size:14px;margin-top:4px">${GOALS[p.goal].label} · <span class="n" style="font-size:16px;color:var(--tx)">${p.lb}</span> lb · Swarthmore</div></div>
+ <button data-a="open" data-v="goals" style="height:44px;color:var(--garnet-t);font:600 14px Inter,sans-serif">Edit</button></header>
+ <section class="g" aria-label="Targets"><span class="lbl">Daily targets</span>
+  <div class="card" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">${[['kcal',fmt(T.kcal)],['Protein',T.p+'g'],['Carbs',T.c+'g'],['Fat',T.f+'g']].map(([l,v],i) => `<div><div class="n" style="font-size:24px;${i===1?'color:var(--lime)':''}">${v}</div><div class="lbl" style="margin-top:8px;font-size:12px">${l}</div></div>`).join('')}</div>
+ </section>
+ <section class="card list" style="padding:0" aria-label="Settings">
+  <button class="li" data-a="open" data-v="goals">${ic('i-sliders','color:var(--t2)')}<span style="flex:1">Goals, diet &amp; allergies</span><span class="t2" style="font-size:14px">${dietOf(p)==='omnivore'?'No restrictions':dietOf(p)[0].toUpperCase()+dietOf(p).slice(1)}${allergiesOf(p).length?` · ${allergiesOf(p).length} allerg${allergiesOf(p).length>1?'ies':'y'}`:''}</span>${ic('i-chev','width:18px;height:18px;color:var(--t3)')}</button>
+  <div class="li">${ic('i-info','color:var(--t2)')}<span style="flex:1">Data sources</span><span class="t2" style="font-size:13px;text-align:right">Menus: The Dash, Nov 14–15<br>Nutrition: Hackro estimates</span></div>
+ </section>
+ ${(p.never || []).length ? `<section class="g" aria-label="Never again"><span class="lbl">Never again</span>
+  <div class="card list" style="padding:0">${p.never.map(n => `<div class="li">${ic('i-ban','color:var(--t3)')}<span style="flex:1;min-width:0">${esc(neverLabel(n))}</span><button class="chip" style="background:var(--s2)" data-a="unnever" data-v="${esc(n)}">Bring back</button></div>`).join('')}</div>
+  <p class="note" style="margin:0">These never show up in your plan. Swapped automatically.</p></section>` : ''}
+ <section class="g" aria-label="Wearable"><span class="lbl">Wearable</span>
+  <div class="card list" style="padding:0">${DEVICES.map(x => `<div class="li"><span class="tile">${ic(x.icon)}</span><span style="flex:1;min-width:0"><span style="display:block;font-weight:600">${x.name}</span>${x.id===S.device ? `<span style="display:block;font-size:13px;margin-top:2px;color:var(--green)">Connected · sharing ${permCount()} of ${PERMS.length}</span>` : `<span class="t2" style="display:block;font-size:13px;margin-top:2px">${S.whoop === 'no' ? 'Got one later? Connect it here' : 'Not connected'}</span>`}</span><button class="chip" style="background:var(--s2)" data-a="${x.id===S.device?'auth':'go'}" data-v="${x.id===S.device?x.id:'connect'}">${x.id===S.device?'Manage data':'Connect'}</button></div>`).join('')}
+  ${S.device ? `<div style="padding:4px 16px 14px;display:flex;flex-wrap:wrap;gap:6px">${PERMS.map(([k,,l]) => `<span style="font-size:12px;padding:4px 10px;border-radius:999px;background:var(--s2);color:${S.perms[k]?'var(--tx)':'var(--t3)'};${S.perms[k]?'':'text-decoration:line-through'}">${l.split(' and ')[0]}</span>`).join('')}</div>` : ''}</div>
+ </section>
+ <button class="ghost fill" data-a="reset">${ic('i-refresh','width:18px;height:18px')}Restart the demo</button>
+ <button class="ghost" data-a="logout" style="color:var(--t2)">${ic('i-logout','width:18px;height:18px')}Sign out</button>
+ </div>`;
+}
+
+function vGoals(){
+ const d = S.draft;
+ return `<div class="bd">
+ ${topBack('Goals &amp; diet')}
+ <div class="g" style="gap:8px;margin-top:-8px"><h1 class="h1">Change a goal and the plan rebuilds from the same menu</h1></div>
+ ${['goal','train','avoid','basics'].map(st => `<section class="g" style="gap:24px">${obBody(st, d).replace(/<div class="g" style="gap:8px"><h1 class="h1">(.*?)<\/h1>(<p class="sub">.*?<\/p>)?<\/div>/, (m0, h) => `<span class="lbl">${h}</span>`)}</section>`).join('<div style="height:1px;background:var(--line)"></div>')}
+ <div style="height:1px;background:var(--line)"></div>
+ <section class="g" style="gap:16px"><span class="lbl">Body goal</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+   <label class="field"><span>Target weight</span><div class="row" style="height:52px;border-radius:16px;background:var(--s1);padding:0 16px;gap:8px"><input class="inp" style="background:transparent;padding:0;height:50px;flex:1;min-width:0;box-shadow:none" type="number" inputmode="decimal" data-bg="target" value="${esc((d.bodyGoal||{}).target || '')}" placeholder="${d.lb}"><span class="u">lb</span></div></label>
+   <label class="field"><span>Target date</span><input class="inp" type="date" data-bg="date" value="${esc((d.bodyGoal||{}).date || '')}"></label>
+  </div>
+  <div id="bgPrev">${goalPreview(d.bodyGoal)}</div>
+ </section>
+ <button class="cta" data-a="saveGoals">Save and rebuild plan</button>
+ </div>`;
+}
+
+/* ========================= RENDER ========================= */
+const app = document.getElementById('app'); const layer = document.getElementById('layer');
+function render(keepScroll){
+ const y = window.scrollY; let html = '';
+ if (S.view === 'login') html = vLogin();
+ else if (S.view === 'ob') html = vOnboard();
+ else if (S.view === 'gen') html = vGen();
+ else if (S.view === 'reveal') html = vReveal();
+ else if (S.view === 'connect') html = vConnect();
+ else {
+  const top = S.stack[S.stack.length - 1];
+  if (top) {
+   const [k, ...rest] = top.split(':'); const v = rest.join(':');
+   html = k === 'meal' ? vMeal(v) : k === 'swap' ? vSwap(v) : k === 'food' ? vFood(v) : k === 'fuel' ? vFuel() : k === 'goals' ? vGoals() : k === 'week' ? vWeek() : k === 'bodygoal' ? vBodyGoal() : '';
+  } else html = ({today:vToday, plan:vPlan, dining:vDining, goals:vTrack, you:vYou}[S.tab] || vToday)();
+  html += tabs();
+ }
+ app.innerHTML = html;
+ layer.innerHTML = S.sheet ? `<div class="sheet-bg" data-a="bgClose"><div class="sheet" role="dialog" aria-modal="true">${({auth:()=>sheetAuth(S.sheet.id), sync:()=>sheetSync(S.sheet.id), synced:()=>sheetSynced(S.sheet.id), iswap:()=>sheetISwap(S.sheet.meal, S.sheet.key), log:sheetLog, reward:sheetReward, flex:sheetFlex})[S.sheet.type]()}</div></div>` : '';
+ window.scrollTo(0, keepScroll ? y : 0);
+ save();
+}
+let toastT;
+function logEat(fn, msg){
+ const snap = plan('sat'); const before = todayHit();
+ fn();
+ for (const x of snap) { const id = x.m.id; const active = (S.ate[id] || []).length || S.done[id];
+  if (active && !S.locked[id]) S.locked[id] = {parts: x.parts.map(pp => ({name: pp.it.name, m: pp.m, orig: pp.orig || 0, added: !!pp.added, from: pp.from || null})), removed: x.removed || []};
+  if (!active) delete S.locked[id]; }
+ const now = plan('sat'); const after = todayHit(); const O = overInfo();
+ const sg = v => (v >= 0 ? '+' : '−') + fmt(Math.abs(v));
+ const ch = now.filter(isUp).map(x => { const b = snap.find(y => y.m.id === x.m.id); return b && isUp(b) ? {n: x.m.name, dk: x.tot.k - b.tot.k, dp: x.tot.p - b.tot.p} : null; }).filter(c => c && Math.abs(c.dk) >= 20).sort((a, b) => Math.abs(b.dk) - Math.abs(a.dk));
+ const adj = ch.length ? `${ch[0].n} adjusted: ${sg(ch[0].dk)} kcal, ${sg(Math.round(ch[0].dp))} g protein${ch.length > 1 ? ` (+${ch.length - 1} more)` : ''}` : '';
+ if (!before && after) { S.sheet = {type:'reward'}; return; }
+ if (before && !after) { toast(O.overRange ? 'Over your range. No streak freeze yet, so today won\'t count' : 'Below target again. Streak paused'); return; }
+ const t = [msg, adj].filter(Boolean).join('. '); if (t) toast(t);
+}
+function toast(msg){
+ clearTimeout(toastT);
+ let el = document.querySelector('.toast'); if (!el) { el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
+ el.innerHTML = `${ic('i-check','width:16px;height:16px;color:#2E7D32;stroke-width:2.75')}${msg}`;
+ toastT = setTimeout(() => el.remove(), 2600);
+}
+function runGen(){
+ S.view = 'gen'; S.gen = 0; render(); createProfile();
+ const tick = () => { S.gen++; if (S.gen >= 4) { S.view = 'reveal'; render(); return; } render(true); setTimeout(tick, 650); };
+ setTimeout(tick, 650);
+}
+function enterApp(){ S.view = 'app'; S.tab = 'today'; S.stack = []; S.sheet = null; render(); }
+
+const A = {
+ login(){ S.view = 'ob'; S.step = 0; render(); },
+ set(el){ const tgt = S.view === 'app' ? S.draft : S.p; tgt[el.dataset.k] = el.dataset.num ? +el.dataset.v : el.dataset.v; render(true); },
+ toggle(el){ const tgt = S.view === 'app' ? S.draft : S.p; tgt[el.dataset.k] = !tgt[el.dataset.k]; render(true); },
+ setDiet(el){ const tgt = S.view === 'app' ? S.draft : S.p; const v = el.dataset.v; tgt.restrictions = (tgt.restrictions || []).filter(r => !DIET_VALUES.has(r)); if (v !== 'omnivore') tgt.restrictions.push(v); tgt.dietPicked = true; render(true); },
+ allergy(el){ const tgt = S.view === 'app' ? S.draft : S.p; const v = el.dataset.v; tgt.restrictions = tgt.restrictions || []; tgt.restrictions = tgt.restrictions.includes(v) ? tgt.restrictions.filter(x => x !== v) : [...tgt.restrictions, v]; tgt.allergySet = true; render(true); },
+ noAllergy(){ const tgt = S.view === 'app' ? S.draft : S.p; tgt.restrictions = (tgt.restrictions || []).filter(r => DIET_VALUES.has(r)); tgt.otherOn = false; tgt.allergySet = true; render(true); },
+ otherAllergy(){ const tgt = S.view === 'app' ? S.draft : S.p; tgt.otherOn = !tgt.otherOn; tgt.allergySet = true; if (!tgt.otherOn) setOtherRestriction(tgt, ''); render(true); },
+ step(el){ const tgt = S.view === 'app' ? S.draft : S.p; const k = el.dataset.k; tgt[k] = Math.max(+el.dataset.min, Math.min(+el.dataset.max, (+tgt[k]) + (+el.dataset.d))); render(true); },
+ obBack(){ S.obTried = false; S.step = Math.max(0, S.step - 1); render(); },
+ obNext(){ if (!obValid()) { S.obTried = true; render(true); return; } S.obTried = false; if (S.step < OB_STEPS - 1) { S.step++; render(); } else runGen(); },
+ go(el){ S.view = el.dataset.v; render(); },
+ enter: enterApp,
+ whoopYes(){ S.whoop = 'yes'; S.view = 'connect'; render(); },
+ whoopNo(){ S.whoop = 'no'; enterApp(); },
+ auth(el){ S.whoop = 'yes'; S.sheet = {type:'auth', id:el.dataset.v, perms: S.device ? {...S.perms} : ALLPERMS()}; render(true); },
+ perm(el){ const k = el.dataset.v; S.sheet.perms = {...S.sheet.perms, [k]: !S.sheet.perms[k]}; render(true); },
+ disconnect(){ S.device = null; S.sheet = null; toast('Whoop disconnected'); render(true); },
+ closeSheet(){ S.sheet = null; render(true); },
+ bgClose(el, e){ if (e.target === el && S.sheet && S.sheet.type !== 'sync') { S.sheet = null; render(true); } },
+ allow(el){ const id = el.dataset.v; const pm = S.sheet.perms;
+  if (S.device === id) { S.perms = pm; S.sheet = null; toast(`Whoop now shares ${permCount()} of ${PERMS.length} data types`); render(true); return; }
+  // Real connect: remember the chosen perms, then send the user through WHOOP OAuth.
+  S.perms = pm; S.sheet = null; connectWhoopLive(); },
+ tab(el){ S.tab = el.dataset.v; S.stack = []; render(); },
+ open(el){ const v = el.dataset.v; if (v === 'goals') S.draft = JSON.parse(JSON.stringify(S.p)); if (v.startsWith('swap:')) S.swapSel = null; S.stack.push(v); render(); },
+ back(){ S.stack.pop(); render(); },
+ finish(el){ const id = el.dataset.v; const x = plan('sat').find(y => y.m.id === id); const n = skipped(x); logEat(() => { S.done[id] = true; }, `${x.m.name} logged · skipped ${n}`); if (S.stack.length) S.stack.pop(); render(); },
+ iswap(el){ const [meal, key] = el.dataset.v.split('|'); S.sheet = {type:'iswap', meal, key}; render(true); },
+ iswapGo(el){ const [meal, key, name, m] = el.dataset.v.split('|'); const x = plan(mealById(meal).day).find(y => y.m.id === meal); const cur = x.parts.find(q => (q.from || q.it.name) === key);
+  S.sheet = null; logEat(() => { S.itemSwaps[meal] = {...(S.itemSwaps[meal] || {}), [key]: {name, m:+m}}; S.ate[meal] = (S.ate[meal] || []).filter(n => n !== cur.it.name); }, `${name} swapped in`); render(true); },
+ iswapReset(el){ const [meal, key] = el.dataset.v.split('|'); const sw = {...(S.itemSwaps[meal] || {})}; delete sw[key]; S.itemSwaps[meal] = sw; S.sheet = null; toast(`Back to ${key}`); render(true); },
+ never(el){ const [name, mid] = el.dataset.v.split('|'); const short = neverLabel(name);
+  const day = mealById(mid).day; const before = plan(day).find(y => y.m.id === mid); const had = before && before.parts.some(pp => pp.it.name === name);
+  S.sheet = null;
+  logEat(() => {
+   S.p.never = [...new Set([...(S.p.never || []), name])];
+   for (const id in S.adds || {}) S.adds[id] = S.adds[id].filter(a => a.name !== name);
+   for (const id in S.locked) { const L = S.locked[id]; const ate = new Set(S.ate[id] || []); if (L.parts && !S.done[id]) L.parts = L.parts.filter(q => q.name !== name || ate.has(name)); }
+  }, '');
+  const after = had ? plan(day).find(y => y.m.id === mid) : null;
+  const rep = after ? after.parts.find(pp => !before.parts.some(q => q.it.name === pp.it.name)) : null;
+  if (!S.sheet) toast(`${short} won't be suggested again${rep ? ` · ${shortName(rep.it)} instead` : ''}`);
+  if (S.stack.length && S.stack[S.stack.length - 1].startsWith('food:')) S.stack.pop();
+  render(); },
+ unnever(el){ const name = el.dataset.v; S.p.never = (S.p.never || []).filter(n => n !== name); toast(`${neverLabel(name)} is back in your plans`); render(); },
+ openLog(){ S.sheet = {type:'log', tab:'quick', q:'', c:{}}; render(true); },
+ logTab(el){ S.sheet.tab = el.dataset.v; render(true); },
+ logConfirm(){ const cf = S.sheet.confirm; S.sheet.confirm = null; S.sheet.ok = true; A[cf.a]({dataset:{v:cf.v}}); },
+ logCancel(){ S.sheet.confirm = null; render(true); },
+ logQuick(el){ const [name, k, p, c, f] = QUICK[+el.dataset.v]; const hits = userHits(guessAllergens(name), name); if (needConfirm('logQuick', el.dataset.v, hits)) return; S.sheet = null; logEat(() => S.extras.push({name, k, p, c, f, src:'Quick add', hits}), `${name} logged`); postLog(null, {name, k, p, c, f}); render(true); },
+ logMenu(el){ const [name, mid] = el.dataset.v.split('|'); const it = findItem(name, mid); const n = it.nut; const hits = userHits(allergenState(it).list, name); if (needConfirm('logMenu', el.dataset.v, hits)) return; S.sheet = null; logEat(() => S.extras.push({name: `${name}, ${qty(n[4], n[5])}`, k:n[0], p:n[1], c:n[2], f:n[3], src:'Dining Center', hits}), `${name} logged`); postLog(mid, {name, k:n[0], p:n[1], c:n[2], f:n[3]}); render(true); },
+ cGram(el){ const c = S.sheet.c; c.grams = Math.max(25, (+c.grams || 100) + (+el.dataset.v)); c.manual = false; recomputeCustom(); updateCustomDom(); },
+ logCustom(){ const c = S.sheet.c || {}; if (!c.name || !(+c.k)) { toast('Add a name and calories'); return; } const hits = userHits(guessAllergens(c.name), c.name); if (needConfirm('logCustom', '', hits)) return; S.sheet = null; logEat(() => S.extras.push({name:c.name, k:+c.k||0, p:+c.p||0, c:+c.c||0, f:+c.f||0, src:'Custom', hits}), `${c.name} logged`); postLog(null, {name:c.name, k:+c.k||0, p:+c.p||0, c:+c.c||0, f:+c.f||0}); render(true); },
+ rmExtra(el){ const i = +el.dataset.v; logEat(() => S.extras.splice(i, 1), 'Removed'); render(true); },
+ seeRewards(){ S.sheet = null; S.tab = 'goals'; S.stack = []; render(); },
+ eat(el){ const id = el.dataset.v; logEat(() => { const x = plan(mealById(id).day).find(y => y.m.id === id); S.ate[id] = x.parts.map(pp => pp.it.name); S.done[id] = true; }, `${mealById(id).name} logged`); if (S.stack.length) S.stack.pop(); render(); },
+ eatMeal(el){ const id = el.dataset.v; const x = plan('sat').find(y => y.m.id === id); const done = mealDone(x), started = mealStarted(x); logEat(() => { if (done) { S.ate[id] = []; S.done[id] = false; } else if (started) { S.done[id] = true; } else { S.ate[id] = x.parts.map(pp => pp.it.name); S.done[id] = true; } }, done ? `${x.m.name} unmarked` : started ? `${x.m.name} logged · skipped ${skipped(x)}` : `${x.m.name} logged`); render(true); },
+ eatItem(el){ const [id, name] = el.dataset.v.split('|'); const cur = ateSet(id); logEat(() => { cur.has(name) ? cur.delete(name) : cur.add(name); S.ate[id] = [...cur]; if (!cur.size) S.done[id] = false; }); render(true); },
+ swapSel(el){ S.swapSel = el.dataset.v; render(true); },
+ swapGo(el){ const id = el.dataset.v; const sel = S.swapSel; S.swapSel = null; S.stack.pop(); logEat(() => { S.swaps[id] = sel; S.ate[id] = []; S.done[id] = false; delete S.locked[id]; delete S.itemSwaps[id]; }, 'Swapped'); render(); },
+ flex(el){ S.sheet = {type:'flex', meal: el.dataset.v, f:{}}; render(true); },
+ flexSave(){ const id = S.sheet.meal; const f = S.sheet.f || {}; const x = plan('sat').find(y => y.m.id === id);
+  const k = +f.k > 0 ? +f.k : x.tot.k, p = f.p !== undefined && f.p !== '' ? +f.p : (+f.k > 0 ? Math.round(k * 0.2 / 4) : x.tot.p); const rest = Math.max(0, k - p*4);
+  const est = !(+f.k > 0); S.sheet = null; if (S.stack.length) S.stack.pop();
+  logEat(() => { S.flex[id] = est ? {k:x.tot.k, p:x.tot.p, c:x.tot.c, f:x.tot.f, est:true} : {k, p, c: rest*0.55/4, f: rest*0.45/9, est:false}; S.ate[id] = []; S.done[id] = false; }, `${x.m.name} is flex`); render(); },
+ flexSkip(){ S.sheet.f = {}; A.flexSave(); },
+ unflex(el){ const id = el.dataset.v; logEat(() => { delete S.flex[id]; }, 'Flex removed'); render(true); },
+ planDay(el){ S.planDay = el.dataset.v; render(true); },
+ regen(el){ const day = el.dataset.v; const go = () => { for (const m of mealsOfDay(day)) { if ((S.ate[m.id] || []).length || S.done[m.id] || S.flex[m.id]) continue; S.seed[m.id] = (S.seed[m.id] || 0) + 1; delete S.swaps[m.id]; delete S.itemSwaps[m.id]; } };
+  if (day === NOW.day) logEat(go, `New ${day === 'sat' ? 'Saturday' : 'Sunday'} plan built around what you've eaten`); else { go(); toast('New Sunday plan, same targets'); } render(true); },
+ dineMeal(el){ S.dineMeal = el.dataset.v; render(true); },
+ dineFilter(el){ S.dineFilter = S.dineFilter === el.dataset.v ? null : el.dataset.v; render(true); },
+ dineFits(){ S.dineFits = S.dineFits === false; render(true); },
+ sport(el){ const tgt = S.view === 'app' ? S.draft : S.p; const cur = Array.isArray(tgt.sport) ? tgt.sport : tgt.sport ? [tgt.sport] : []; const v = el.dataset.v; tgt.sport = cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v]; render(true); },
+ addToPlan(el){ const [name, mid] = el.dataset.v.split('|'); S.adds = S.adds || {}; logEat(() => { S.adds[mid] = [...(S.adds[mid] || []), {name, m: 1}]; }, `${name.replace(/ FZ$/, '')} added to ${mealById(mid).name.toLowerCase()}`); S.stack.pop(); render(); },
+ logThis(el){ const [name, mid] = el.dataset.v.split('|'); const it = findItem(name, mid); const hits = userHits(allergenState(it).list, name); S.sheet = {type:'log', tab:'menu', q:'', c:{}}; if (needConfirm('logMenu', el.dataset.v, hits)) return; A.logMenu({dataset:{v: el.dataset.v}}); },
+ saveBodyGoal(){ const g = S.bgDraft; const gp = goalPlan(g); if (!gp || gp.same) { toast('Add a target weight and date'); return; } S.p.bodyGoal = {target: +g.target, date: g.date, edits: 0}; S.bgDraft = null; S.stack.pop(); toast(gp.extended ? `Goal set. Ends ${fmtDate(gp.end)} to keep the pace safe` : `Goal set for ${fmtDate(gp.end)}`); render(); },
+ saveGoals(){ if (S.draft.bodyGoal && S.p.bodyGoal && JSON.stringify(S.draft.bodyGoal) !== JSON.stringify(S.p.bodyGoal)) S.draft.bodyGoal.edits = (S.p.bodyGoal.edits || 0) + 1; S.p = S.draft; S.swaps = {}; S.itemSwaps = {}; S.ate = {}; S.done = {}; S.locked = {}; S.flex = {}; S.stack.pop(); toast('Plan rebuilt for your new goals'); render(); },
+ reset(){ const keepEmail = S.p.email; S = DEFAULT(); S.p.email = keepEmail; render(); },
+ logout(){ S.view = 'login'; render(); }
+};
+document.addEventListener('click', e => {
+ const el = e.target.closest('[data-a]'); if (!el) return;
+ const f = A[el.dataset.a]; if (!f) return;
+ if (el.dataset.a !== 'bgClose') e.preventDefault();
+ f(el, e);
+});
+document.addEventListener('input', e => {
+ const ds = e.target.dataset || {};
+ if (ds.q && S.sheet) { S.sheet.q = e.target.value; const r = document.getElementById('logRes'); if (r) r.innerHTML = logResults(); return; }
+ if (ds.bg) { const top = S.stack[S.stack.length - 1]; const g = top === 'goals' ? (S.draft.bodyGoal = S.draft.bodyGoal || {}) : (S.bgDraft = S.bgDraft || {}); g[ds.bg] = e.target.value; const pv = document.getElementById('bgPrev'); if (pv) pv.innerHTML = goalPreview(g); return; }
+ if (ds.fx && S.sheet) { S.sheet.f = {...(S.sheet.f || {}), [ds.fx]: e.target.value}; return; }
+ if (ds.cq && S.sheet) { const c = S.sheet.c = S.sheet.c || {}; c.name = e.target.value; c.manual = false; if (!c.grams) c.grams = 100; if (!c.name.trim()) { c.per100 = null; c.match = ''; c.searched = false; c.loading = false; } updateCustomDom(); clearTimeout(CUSTOM_T); const nm = c.name; CUSTOM_T = setTimeout(() => { if (S.sheet && S.sheet.c === c && c.name === nm && nm.trim()) fetchCustomNutrition(nm); }, 500); return; }
+ if (ds.c && S.sheet) { S.sheet.c = {...(S.sheet.c || {}), [ds.c]: e.target.value, manual: true}; updateCustomDom(); return; }
+ if (ds.otherinput !== undefined) { const tgt = S.view === 'app' ? S.draft : S.p; setOtherRestriction(tgt, e.target.value); save(); if (S.view === 'ob') { const eb = document.getElementById('obErr'); if (eb) eb.innerHTML = errBox(S.step); } return; }
+ const k = e.target.dataset && e.target.dataset.k; if (!k) return;
+ const tgt = S.view === 'app' ? S.draft : S.p; tgt[k] = ds.num ? (e.target.value === '' ? '' : +e.target.value) : e.target.value; save();
+ if (S.view === 'ob') { const eb = document.getElementById('obErr'); if (eb) eb.innerHTML = errBox(S.step); }
+});
+document.addEventListener('submit', e => { e.preventDefault(); if (e.target.dataset.form === 'login') A.login(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.sheet && S.sheet.type !== 'sync') { S.sheet = null; render(true); } });
+/* ===================== REAL DATA — Hackro API =====================
+   When this page is served by Next at /, these are same-origin calls to
+   the /api routes backed by SQLite. Everything degrades to the built-in demo
+   data above if the API is unreachable (e.g. the file opened directly), so the
+   prototype never hard-fails. One seeded test user: demo-profile. */
+const API = {
+ profileId: 'demo-profile',
+ // mockup mealId -> real DB {date, meal}. Snack (sat-s) reuses sat-b via `from`.
+ map: {
+  'sat-b': {date:'2026-11-14', meal:'breakfast'},
+  'sat-l': {date:'2026-11-14', meal:'lunch'},
+  'sat-d': {date:'2026-11-14', meal:'dinner'},
+  'sun-br':{date:'2026-11-15', meal:'brunch'},
+  'sun-d': {date:'2026-11-15', meal:'dinner'},
+  'sun-5': {date:'2026-11-15', meal:'latenight'}
+ },
+ idByName: {} // mealId -> { itemName: dbMenuItemId }, for logging real menu items
+};
+/* The real feed has only dietary[]/allergens[], not the mockup's role/flags.
+   Derive them from the dish name + labels so the existing solver keeps working. */
+function guessRole(name){
+ const n = name.toLowerCase();
+ if (/cookie|brownie|cake|pie|donut|doughnut|pastry|muffin|scone|pudding|blondie|cheesecake|ice cream|cupcake|dessert|chocolate chip|strata/.test(n)) return 'S';
+ if (/chicken|beef|steak|pork|sausage|bacon|turkey|\bham\b|shrimp|salmon|\bfish\b|tofu|lentil|shawarma|meatball|wings|tenders|burger|gyro|shrimp|ravioli/.test(n)) return 'P';
+ if (/rice|pasta|cavatappi|potato|fries|bread|\bbun|waffle|pancake|oatmeal|grits|noodle|quinoa|tortilla|pita|bagel|hashbrown|tots|biscuit|cereal|granola|chickpea|cavatappi/.test(n)) return 'C';
+ if (/yogurt|\beggs?\b|cheese|edamame|cottage/.test(n)) return 'D';
+ if (/salad|lettuce|broccoli|green bean|asparagus|carrot|cucumber|tomato|cabbage|eggplant|spinach|kale|vegetable|zucchini|pepper|romaine|greens/.test(n)) return 'V';
+ if (/fruit|melon|berry|berries|grape|apple|orange|banana|blueberr|grapefruit|applesauce|mango|craisin|raisin/.test(n)) return 'F';
+ if (/sauce|dressing|syrup|honey|butter|jam|compote|salsa|chimichu|ragout|\bcream\b|gravy|aioli|mayo|seasoning|flakes|sugar|almond|coconut|scallion|bits|dip/.test(n)) return 'K';
+ return 'X';
+}
+function guessFlags(name, diet){
+ const d = (diet || []).map(x => String(x).toLowerCase());
+ if (d.includes('vegan') || d.includes('vegetarian')) return '';
+ const n = name.toLowerCase();
+ if (/shrimp|salmon|tuna|\bfish\b|crab|lobster|shellfish/.test(n)) return 'f';
+ if (/chicken|beef|steak|pork|sausage|bacon|turkey|\bham\b|lamb|\bmeat\b|wings|gyro|shawarma|pepperoni/.test(n)) return 'm';
+ return '';
+}
+async function jget(url){ const r = await fetch(url); if (!r.ok) throw new Error(url + ' -> ' + r.status); return r.json(); }
+/* The profile the app writes against: the one onboarding created, else the seeded test user. */
+function currentProfileId(){ return (typeof S !== 'undefined' && S && S.profileId) || API.profileId; }
+/* Persist onboarding answers as a real Profile row; key later calls off its id. */
+async function createProfile(){
+ try {
+  const p = S.p;
+  const heightCm = Math.round(((+p.ft || 0) * 12 + (+p.inch || 0)) * 2.54);
+  const weightKg = +((+p.lb || 0) * 0.4536).toFixed(1);
+  const days = +p.days || 0;
+  const activityLevel = days <= 1 ? 'light' : days <= 3 ? 'moderate' : days <= 5 ? 'active' : 'veryActive';
+  const input = { name: p.name || 'Student', goal: p.goal, heightCm, weightKg, age: +p.age || 20, sex: p.sex, activityLevel, restrictions: p.restrictions || [] };
+  const res = await fetch('/api/profile', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) });
+  if (res.ok) { const prof = await res.json(); S.profileId = prof.id; save(); console.log('[Hackro] profile created in DB:', prof.id); }
+  else console.warn('[Hackro] /api/profile rejected:', res.status, await res.text());
+ } catch (e) { console.warn('[Hackro] profile create failed (keeping test user):', e.message); }
+}
+/* Send the user through the REAL WHOOP OAuth consent for the current profile.
+   WHOOP returns them to /?whoop=connected, handled by handleWhoopReturn(). */
+function connectWhoopLive(){ save(); window.location.href = '/api/whoop/connect?profileId=' + encodeURIComponent(currentProfileId()); }
+/* On return from OAuth, pull the connected account's real recovery/strain. */
+async function handleWhoopReturn(){
+ if (new URL(location.href).searchParams.get('whoop') !== 'connected') return;
+ history.replaceState({}, '', '/'); // so a refresh doesn't re-trigger
+ try {
+  const w = await jget(`/api/whoop?profileId=${encodeURIComponent(currentProfileId())}&mock=false`);
+  if (typeof w.recovery === 'number') { WEAR.recovery = Math.round(w.recovery); WEAR.strain = Math.round(w.strain * 10) / 10; }
+  S.device = 'whoop';
+  if (!(S.perms && S.perms.recovery)) S.perms = ALLPERMS();
+  if (['login', 'ob', 'gen', 'connect', 'reveal'].includes(S.view)) { S.view = 'app'; S.tab = 'today'; }
+  save();
+  toast(w.mock ? 'Whoop connected · last synced data' : `Whoop live · recovery ${WEAR.recovery}%, strain ${WEAR.strain}`);
+  render(true);
+  console.log('[Hackro] WHOOP', w.mock ? '(fell back to last known)' : 'LIVE', w);
+ } catch (e) { console.warn('[Hackro] whoop return fetch failed:', e.message); }
+}
+async function bootstrapRealData(){
+ try {
+  const results = await Promise.all(Object.entries(API.map).map(([id, q]) =>
+   jget(`/api/menu?date=${q.date}&meal=${q.meal}`).then(d => [id, d.items || []])));
+  let loaded = 0;
+  for (const [id, items] of results) {
+   if (!items.length) continue; // keep the built-in menu for this slot
+   const byStation = {}; API.idByName[id] = {};
+   for (const it of items) {
+    const existing = NUT[it.name]; const hasReal = it.calories > 0; let nut;
+    if (existing) {
+     nut = existing.slice();
+     if (hasReal) { nut[0] = Math.round(it.calories); nut[1] = Math.round(it.protein); nut[2] = Math.round(it.carbs); nut[3] = Math.round(it.fat); }
+    } else if (hasReal) {
+     nut = [Math.round(it.calories), Math.round(it.protein), Math.round(it.carbs), Math.round(it.fat), 1, 'serving', guessRole(it.name), guessFlags(it.name, it.dietary)];
+    } else {
+     continue; // no macros and no estimate: the solver would drop it anyway
+    }
+    NUT[it.name] = nut; API.idByName[id][it.name] = it.id;
+    const tags = [...(it.dietary || []), ...(it.allergens || [])].map(l => `::${String(l).toLowerCase()}::`).join(' ');
+    const piece = tags ? `${it.name} ${tags}` : it.name;
+    const st = it.station || 'Menu';
+    byStation[st] = byStation[st] ? byStation[st] + ', ' + piece : piece;
+    loaded++;
+   }
+   if (Object.keys(byStation).length) MENU[id] = byStation;
+  }
+  if (!loaded) return; // nothing usable; keep the built-in demo menu
+  for (const k in CACHE) delete CACHE[k];
+  for (const k in RANK) delete RANK[k];
+  for (const k in BASE) delete BASE[k];
+  console.log(`[Hackro] Loaded ${loaded} real menu items from /api/menu (demo-profile)`);
+  render(true);
+ } catch (e) {
+  console.warn('[Hackro] API unavailable — using built-in demo data:', e.message);
+ }
+}
+/* Persist an "I ate this" to the DB. Non-blocking: the UI already updated. */
+async function postLog(mealId, entry){
+ try {
+  const q = API.map[mealId] || API.map['sat-l'];
+  const menuItemId = (mealId && API.idByName[mealId]) ? API.idByName[mealId][entry.name] : null;
+  const body = menuItemId
+   ? { profileId: currentProfileId(), date: q.date, meal: q.meal, servings: 1, menuItemId }
+   : { profileId: currentProfileId(), date: q.date, meal: q.meal, servings: 1, name: entry.name, calories: entry.k || 0, protein: entry.p || 0, carbs: entry.c || 0, fat: entry.f || 0 };
+  const r = await fetch('/api/log', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  if (r.ok) console.log('[Hackro] logged to DB:', entry.name); else console.warn('[Hackro] /api/log rejected:', r.status);
+ } catch (e) { /* offline / opened as a file: local log already stands */ }
+}
+render();
+bootstrapRealData();
+handleWhoopReturn();
+</script>
+</body>
+</html>

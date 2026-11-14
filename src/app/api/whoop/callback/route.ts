@@ -33,6 +33,6 @@ export async function GET(request: Request) {
     );
   }
 
-  // Back into the app; the UI can read ?whoop=connected.
+  // Back into the app; the UI reads ?whoop=connected and pulls live data.
   return Response.redirect(new URL("/?whoop=connected", request.url).toString(), 302);
 }

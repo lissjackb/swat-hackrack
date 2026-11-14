@@ -102,12 +102,15 @@ async function validAccessToken(profileId: string): Promise<string | null> {
   if (!row) return null;
   // Refresh if it expires within 60s.
   if (row.expiresAt.getTime() - Date.now() > 60_000) return row.accessToken;
+  // WHOOP's refresh grant expects scope=offline ONLY (not the full read-scope
+  // list, which it rejects as invalid_request). Read scopes carry over from the
+  // original grant; offline is what mints the next refresh token.
   const refreshed = await postToken({
     grant_type: "refresh_token",
     refresh_token: row.refreshToken,
     client_id: clientId(),
     client_secret: clientSecret(),
-    scope: SCOPES.join(" "),
+    scope: "offline",
   });
   await storeTokens(profileId, refreshed);
   return refreshed.accessToken;
