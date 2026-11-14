@@ -14,7 +14,7 @@ Students walk into the dining hall without knowing what to eat, grab something a
 
 ## Team
 - **Harlan**: front end (React UI in the Next.js app)
-- **Liss**: back end (scraper, Prisma/SQLite, API routes, LP solver)
+- **Liss**: back end (scraper, Prisma/SQLite, API routes, day planner)
 - **Griffy**: presentation, strategy, demo video, and floating help on both sides (seed data, Claude prompt, QA)
 
 ## Hackathon facts that constrain scope (ITrack)
@@ -27,20 +27,15 @@ Students walk into the dining hall without knowing what to eat, grab something a
 
 ## MVP: must work end-to-end by Sat 1:00pm
 1. **Profile → targets.** Short onboarding (goal: build / maintain / cut / perform; height, weight, age, sex, activity level; dietary restrictions) → daily and per-meal calorie, protein, carb and fat targets. Standard formula (Mifflin-St Jeor × activity factor, protein in g/kg), shown transparently.
-<<<<<<< Updatedgi upstream
-2. **Today's Swarthmore Dining Center menu, with per-item nutrition**, loaded into SQLite. `data/menu-snapshot.json` is the fallback whenever the live source fails.
-3. **Recommended plate.** The LP solver picks items and servings from the current meal that get closest to the meal's macro target, honoring restrictions (vegan, vegetarian, allergens). The Claude API writes a 1–2 sentence "why this plate" note.
-4. **"I ate this" logging → progress.** Daily progress bars against targets, plus a week view.
-5. **Whoop (thin slice).** Pull today's recovery and strain for ONE connected account and adjust that day's targets (e.g. more carbs after high strain, recovery-focused plate when recovery is red). Ship a **mock toggle** so the demo never depends on a live OAuth token.
-=======
+   - Allergies use a multi-select of the allergens the dining data actually tags (Milk, Egg, Fish, Shellfish, Peanut, Tree Nut, Soy, Sesame, Wheat, Gluten) plus "None". Editable later in profile. See "Allergy rules".
 2. **Plan builder (sets the goals).** From the profile plus what the student wants ("add 5 lb of muscle by spring break"), Claude (**Sonnet 5.5**) drafts a goal plan: target, realistic timeline, weekly milestones, and phase changes (e.g. lean bulk → maintain). It returns structured JSON plus a short rationale. **Code computes and validates every number** (see "Plan guardrails"). This is a *nutrition goal plan*. It does not program workouts; that stays OUT.
 3. **Plan editing.** The student tweaks parameters (timeline, rate, target weight, restrictions) → code recomputes targets → Claude (**Haiku 5.5**) rewrites the rationale and milestones. Edits never call Sonnet.
-4. **Today's Swarthmore Dining Center menu, with per-item nutrition**, loaded into SQLite. `menu-snapshot.json` is the fallback whenever the live source fails.
-5. **Recommended plate.** The LP solver picks items and servings from the current meal that get closest to the meal's macro target, honoring restrictions (vegan, vegetarian, allergens). The Claude API (**Haiku 5.5**) writes a 1–2 sentence "why this plate" note.
+4. **Today's Swarthmore Dining Center menu, with per-item nutrition**, loaded into SQLite. `data/menu-snapshot.json` is the fallback whenever the live source fails.
+5. **Recommended plate.** The day planner (`src/lib/planner/`, ported from the mockup; it replaced the LP solver on Sat 4am, see `docs/PLANNER_SPEC.md`) picks items and real portions for every meal of the day, lands the day on the calorie and protein targets, and honors restrictions (vegan, vegetarian, pescatarian, halal, allergens). The same module runs in the API routes and in the React UI. The Claude API (**Haiku 5.5**) writes a 1–2 sentence "why this plate" note.
 6. **"I ate this" logging → progress.** Daily progress bars against targets, plus a week view.
 7. **Daily meal summary.** At end of day (or on demand in the demo), Claude (**Haiku 5.5**) summarizes what was eaten against targets: hits, misses, and one suggestion for tomorrow. Numbers in the summary come from the DB, not from the model.
-8. **Flex meal** (the team's working name was "cheat meal"; see Tone). The student marks a meal as flex. It's logged honestly (estimated macros, or a "skip" item), and **the solver re-balances the remaining meals that day** to stay as close to target as possible. In the demo: mark lunch as flex → dinner's recommended plate visibly changes.
-9. **Whoop (thin slice).** Pull today's recovery and strain for ONE connected account and adjust that day's targets (e.g. more carbs after high strain, recovery-focused plate when recovery is red). Ship a **mock toggle** so the demo never depends on a live OAuth token.
+8. **Flex meal** (the team's working name was "cheat meal"; see Tone). The student marks a meal as flex. It's logged honestly (estimated macros, or a "skip" item), and **the planner re-balances the remaining meals that day** to stay as close to target as possible. In the demo: mark lunch as flex → dinner's recommended plate visibly changes.
+9. **Whoop (thin slice).** Pull today's recovery and strain **once** for ONE connected account and adjust that day's targets from the real numbers (more carbs after high strain, more protein when recovery is red; rule in `docs/PLANNER_SPEC.md`). Ship a **mock toggle** so the demo never depends on a live OAuth token. Refreshing Whoop through the day is a pitch / Next steps item, not built tonight.
 
 **Cut order if we're behind at the Sat 10:30am checkpoint** (cut from the top first): live Whoop (keep the mock) → plan editing (re-run onboarding instead) → flex meal → daily summary. Never cut the core loop: plan/targets → menu → plate → log → progress.
 
@@ -61,14 +56,26 @@ Rules:
 - Log model, tokens in/out, and latency per call in the console. The usage numbers go in the design-decisions slide.
 - Full cost matrix and rationale: `docs/DESIGN_DECISIONS.md`.
 
+## React port of the mockup (decided Sat 4am)
+- The React UI is a port of `docs/mockup/hackro-mockup.html`. Rules, line map and lanes: `docs/PORT_PLAN.md`. **Everything in the mockup is in scope for the port** (streaks, rewards, body goal, weekly report, etc.), even where the MVP list above doesn't name it.
+- Where this file and the mockup disagree: the mockup wins on layout, order, copy and planner behavior; this file wins on safety (allergy rules, guardrails, tone, no medical advice). If you can't tell which applies, stop and ask.
+
+## Allergy rules (HARD constraints, enforced in code)
+- An item tagged with any of the user's allergens is **filtered out before the planner runs**. It is never a candidate, so it can never be recommended, swapped in, or suggested by Claude. Don't rely on the planner or the prompt to avoid it.
+- **Fail closed:** if an item has *no* allergen data at all, it's excluded for any user with at least one allergy. Missing data ≠ safe.
+- Claude prompts receive only the already-filtered plate. Claude never proposes additional foods outside the plate.
+- Flex meals and manual logging can include anything (the user chose it), but show a clear warning if a logged item carries one of their allergens.
+- Always show this line on the plate card: "Allergen info comes from Dining Services. Cross-contact is possible, so confirm with staff." Hackro reduces risk; it can't guarantee safety.
+- **Test it:** a unit test creates a user with a peanut allergy and asserts that no recommended plate ever contains a peanut-tagged item, across every meal in the snapshot.
+
 ## Plan guardrails (enforced in code, not in the prompt)
 - Calories never go below a safe floor (do not go under BMR from the formula) and never more than ~500 kcal/day away from maintenance in either direction.
 - Weight-change rate capped at about 0.5–1% of body weight per week. If a requested goal violates this, the plan **extends the timeline** and says so plainly.
 - Protein within ~1.6–2.2 g/kg for build/perform goals.
 - If Sonnet's JSON is malformed or out of bounds → clamp it to the bounds, use the formula plan, and keep going. Never block the user.
->>>>>>> Stashed changes
 
 ## Stretch: only if MVP is done and demo-stable by Sat ~10:30am
+- **First stretch pick: carb-conscious mode** (supports students who count carbs, e.g. for diabetes). The student *enters their own* per-meal carb budget (it comes from their care team; Hackro never calculates it). The planner treats it as a hard cap, the plate card shows carbs prominently, and an in-app (not push) "check your glucose before you eat" reminder appears at mealtimes. **Never** any insulin or medication dosing advice, in the UI or in Claude prompts. If it isn't built, it goes on the Next steps slide, with continuous glucose monitor integration as the longer-term version. In the pitch, say "supports students who count carbs," not "manages diabetes."
 - Haverford DC and Bryn Mawr (Erdman, New Dorm) menus. They run on a different menu system than Swarthmore, so each one needs its own scraper.
 - Whoop OAuth for any user (not just our one demo account).
 
@@ -95,7 +102,7 @@ Rules:
 - The Anthropic API is billed separately from Claude Pro. Use one Console org with prepaid credit and a low spend limit; each of us gets our own key in that org.
 
 ## Architecture (Liss's diagram)
-Dining site (menu JSON/HTML) → scraper (`tsx` + Cheerio, or a direct JSON fetch) → SQLite via Prisma (`dev.db`) → Next.js API routes (macro targets + LP solver) ↔ React UI (profiles, menu, plates). API routes → Claude API (plate explanations). `data/menu-snapshot.json` is the demo fallback that feeds the scraper step.
+Dining site (menu JSON/HTML) → scraper (`tsx` + Cheerio, or a direct JSON fetch) → SQLite via Prisma (`dev.db`) → Next.js API routes (macro targets + day planner) ↔ React UI (profiles, menu, plates). The planner in `src/lib/planner/` is shared: API routes and the React store import the same module. API routes → Claude API (plate explanations). `data/menu-snapshot.json` is the demo fallback that feeds the scraper step.
 
 ## Checkpoints
 - **Fri midnight:** today's menu with nutrition is in the DB (live or snapshot). The `/targets` endpoint returns numbers. The UI skeleton renders the menu.
@@ -115,4 +122,4 @@ When a meaningful chunk of work is done with AI help, append one line to `docs/A
 Example check methods: spot-checked 5 menu items' macros against NetNutrition, hand-computed one target with the formula, read and tested generated code.
 
 ## Tone and safety
-Frame Hackro around **fueling performance and hitting goals**, not restriction. Use no "good/bad food" language and no shaming copy. That's why the UI says **"flex meal"**, not "cheat meal": a flex meal is a planned part of the week, not a failure. Allergen filters are hard constraints the solver must never violate.
+Frame Hackro around **fueling performance and hitting goals**, not restriction. Use no "good/bad food" language and no shaming copy. That's why the UI says **"flex meal"**, not "cheat meal": a flex meal is a planned part of the week, not a failure. Allergen filters are hard constraints the planner must never violate.
