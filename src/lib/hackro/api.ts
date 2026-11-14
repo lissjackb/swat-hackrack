@@ -4,7 +4,6 @@ import type {
   ActivityLevel,
   MacroTargets,
   MenuItemDTO,
-  Plate,
   ProfileInput,
   Targets,
   WhoopSnapshot,
@@ -62,12 +61,6 @@ export const api = {
     jfetch<{ items: MenuItemDTO[] }>(
       `/api/menu?date=${date}${meal ? `&meal=${meal}` : ""}`,
     ).then((r) => r.items),
-
-  recommend: (meal: string, date: string, target: MacroTargets, restrictions: string[]) =>
-    jfetch<Plate>("/api/recommend", {
-      method: "POST",
-      body: JSON.stringify({ meal, date, target, restrictions }),
-    }),
 
   logMenu: (profileId: string, date: string, meal: string, menuItemId: string, servings = 1) =>
     jfetch<unknown>("/api/log", {
