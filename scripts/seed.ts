@@ -42,14 +42,25 @@ async function main() {
 
   // 3) A week of logged history. Reuse today's menu items as stand-ins;
   //    LogEntry.date carries the historical day.
-  const items = await db.menuItem.findMany();
-  if (items.length === 0) {
-    console.warn("No menu items found — run `npm run scrape` first. Skipping log history.");
+  // Use ENRICHED items only (calories > 0) so the week view shows real
+  // progress, not zeros. Items with 0 macros are unenriched menu rows —
+  // run `/api/nutrition?date=...` (USDA) to fill them in first.
+  const enriched = await db.menuItem.findMany({ where: { calories: { gt: 0 } } });
+  if (enriched.length === 0) {
+    console.warn(
+      "No enriched menu items (all macros 0) — run the scraper + /api/nutrition first. Skipping log history.",
+    );
   } else {
+    // A realistic day: up to 2 items from each meal.
+    const fromMeal = (meal: string) =>
+      enriched.filter((i) => i.meal === meal).slice(0, 2);
+    const picks = [
+      ...fromMeal("breakfast"),
+      ...fromMeal("lunch"),
+      ...fromMeal("dinner"),
+    ];
     await db.logEntry.deleteMany({ where: { profileId: profile.id } });
     for (let d = 1; d <= 6; d++) {
-      // 3-4 items per past day, spread across meals.
-      const picks = items.slice(0, 4);
       for (const item of picks) {
         await db.logEntry.create({
           data: {
@@ -62,7 +73,7 @@ async function main() {
         });
       }
     }
-    console.log("Seeded 6 days of log history.");
+    console.log(`Seeded 6 days of log history (${picks.length} items/day, enriched).`);
   }
 
   console.log("Seed complete.");
