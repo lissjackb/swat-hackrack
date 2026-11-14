@@ -1,57 +1,100 @@
 "use client";
+// The app shell — the mockup's render() router (1523–1544): view switch,
+// pushed-screen stack, 5 tabs, sheet layer, toast.
 import { HackroProvider, useHackro } from "@/lib/hackro/store";
-import Onboarding from "@/components/hackro/Onboarding";
-import Today from "@/components/hackro/Today";
-import Dining from "@/components/hackro/Dining";
-import You from "@/components/hackro/You";
 
-const TABS = [
-  { id: "today", label: "Today" },
-  { id: "dining", label: "Dining" },
-  { id: "you", label: "You" },
-] as const;
+import { Ic, IconSprite } from "@/components/hackro/Icon";
+import { Login } from "@/components/hackro/screens/Login";
+import { Onboarding } from "@/components/hackro/screens/Onboarding";
+import { Gen } from "@/components/hackro/screens/Gen";
+import { Reveal } from "@/components/hackro/screens/Reveal";
+import { Connect } from "@/components/hackro/screens/Connect";
+import { Today } from "@/components/hackro/screens/Today";
+import { Plan } from "@/components/hackro/screens/Plan";
+import { Meal } from "@/components/hackro/screens/Meal";
+import { Swap } from "@/components/hackro/screens/Swap";
+import { Food } from "@/components/hackro/screens/Food";
+import { Fuel } from "@/components/hackro/screens/Fuel";
+import { Dining } from "@/components/hackro/screens/Dining";
+import { Track } from "@/components/hackro/screens/Track";
+import { BodyGoal } from "@/components/hackro/screens/BodyGoal";
+import { Week } from "@/components/hackro/screens/Week";
+import { You } from "@/components/hackro/screens/You";
+import { Goals } from "@/components/hackro/screens/Goals";
+import { SheetLayer } from "@/components/hackro/screens/Sheets";
+
+const TABS: [string, string, string][] = [
+  ["today", "i-home", "Today"],
+  ["plan", "i-plan", "Plan"],
+  ["dining", "i-dining", "Dining"],
+  ["goals", "i-target", "Goals"],
+  ["you", "i-user", "You"],
+];
 
 function Shell() {
-  const { ready, view, tab, setTab } = useHackro();
+  const { S, A, ready, toast } = useHackro();
+  if (!ready) return <div className="app" />;
 
-  if (!ready) {
-    return (
-      <div className="flex flex-1 items-center justify-center text-muted">
-        <span className="text-2xl font-bold tracking-[0.3em]">HACKRO</span>
-      </div>
-    );
+  let body: React.ReactNode = null;
+  let withTabs = false;
+  if (S.view === "login") body = <Login />;
+  else if (S.view === "ob") body = <Onboarding />;
+  else if (S.view === "gen") body = <Gen />;
+  else if (S.view === "reveal") body = <Reveal />;
+  else if (S.view === "connect") body = <Connect />;
+  else {
+    withTabs = true;
+    const top = S.stack[S.stack.length - 1];
+    if (top) {
+      const i = top.indexOf(":");
+      const k = i < 0 ? top : top.slice(0, i);
+      const v = i < 0 ? "" : top.slice(i + 1);
+      body =
+        k === "meal" ? <Meal id={v} />
+        : k === "swap" ? <Swap id={v} />
+        : k === "food" ? <Food arg={v} />
+        : k === "fuel" ? <Fuel />
+        : k === "goals" ? <Goals />
+        : k === "week" ? <Week />
+        : k === "bodygoal" ? <BodyGoal />
+        : null;
+    } else {
+      body = { today: <Today />, plan: <Plan />, dining: <Dining />, goals: <Track />, you: <You /> }[S.tab] ?? <Today />;
+    }
   }
 
-  if (view === "onboarding") return <Onboarding />;
-
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-1 flex-col">
-      <main className="flex flex-1 flex-col">
-        {tab === "today" && <Today />}
-        {tab === "dining" && <Dining />}
-        {tab === "you" && <You />}
-      </main>
-      <nav className="sticky bottom-0 grid grid-cols-3 border-t border-surface-2 bg-background/95 px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`flex flex-col items-center gap-1 py-2 text-xs font-semibold ${
-              tab === t.id ? "text-foreground" : "text-muted-2"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </nav>
-    </div>
+    <>
+      <div className="app">
+        {body}
+        {withTabs ? (
+          <nav className="tabs" aria-label="Tabs">
+            {TABS.map(([k, i, l]) => (
+              <button key={k} className={`tab ${S.tab === k ? "on" : ""}`}
+                onClick={() => A.tab(k as typeof S.tab)}
+                aria-current={S.tab === k ? "page" : undefined}>
+                <Ic i={i} />{l}
+              </button>
+            ))}
+          </nav>
+        ) : null}
+      </div>
+      <SheetLayer />
+      {toast ? (
+        <div key={toast.key} className="toast" role="status">
+          <Ic i="i-check" s="width:16px;height:16px;color:#2E7D32;stroke-width:2.75" />{toast.msg}
+        </div>
+      ) : null}
+    </>
   );
 }
 
 export default function Page() {
   return (
     <HackroProvider>
+      <IconSprite />
       <Shell />
     </HackroProvider>
   );
 }
+

@@ -443,6 +443,7 @@ export function createEngine(menus: MenuData, ctx: PlanContext) {
 
   return {
     targets: T,
+    fits,
     rank,
     mealsOfDay,
     shareOf,
