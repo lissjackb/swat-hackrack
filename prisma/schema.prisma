@@ -27,8 +27,23 @@ model Profile {
   restrictions  String   @default("[]") // JSON string[] e.g. ["vegan","peanut"]
   createdAt     DateTime @default(now())
 
-  logs      LogEntry[]
-  whoopDays WhoopDay[]
+  logs       LogEntry[]
+  whoopDays  WhoopDay[]
+  whoopToken WhoopToken?
+}
+
+/// Stored WHOOP OAuth tokens for a profile (live mode). Access tokens expire
+/// in ~1hr, so we keep the refresh token and renew on demand. One per profile.
+/// NEVER returned to the client. See src/lib/whoop.ts.
+model WhoopToken {
+  profileId    String   @id
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime // when accessToken stops working
+  scope        String   @default("")
+  updatedAt    DateTime @updatedAt
+
+  profile Profile @relation(fields: [profileId], references: [id])
 }
 
 /// One menu item for one meal on one day, with per-serving nutrition.
