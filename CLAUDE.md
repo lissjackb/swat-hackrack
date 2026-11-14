@@ -27,7 +27,7 @@ Students walk into the dining hall without knowing what to eat, grab something a
 
 ## MVP: must work end-to-end by Sat 1:00pm
 1. **Profile → targets.** Short onboarding (goal: build / maintain / cut / perform; height, weight, age, sex, activity level; dietary restrictions) → daily and per-meal calorie, protein, carb and fat targets. Standard formula (Mifflin-St Jeor × activity factor, protein in g/kg), shown transparently.
-<<<<<<< Updated upstream
+<<<<<<< Updatedgi upstream
 2. **Today's Swarthmore Dining Center menu, with per-item nutrition**, loaded into SQLite. `data/menu-snapshot.json` is the fallback whenever the live source fails.
 3. **Recommended plate.** The LP solver picks items and servings from the current meal that get closest to the meal's macro target, honoring restrictions (vegan, vegetarian, allergens). The Claude API writes a 1–2 sentence "why this plate" note.
 4. **"I ate this" logging → progress.** Daily progress bars against targets, plus a week view.
