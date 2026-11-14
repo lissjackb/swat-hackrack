@@ -46,7 +46,7 @@ async function main() {
   //    LogEntry.date carries the historical day.
   // Use ENRICHED items only (calories > 0) so the week view shows real
   // progress, not zeros. Items with 0 macros are unenriched menu rows —
-  // run `/api/nutrition?date=...` (USDA) to fill them in first.
+  // scripts/enrich.ts (run before this by `npm run seed`) fills them in.
   const enriched = await db.menuItem.findMany({ where: { calories: { gt: 0 } } });
   if (enriched.length === 0) {
     console.warn(
