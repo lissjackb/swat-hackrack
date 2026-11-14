@@ -1,0 +1,2079 @@
+{
+  "_comment": "Demo fallback (CLAUDE.md). Captured LIVE from dash.swarthmore.edu/graphql (cbordnetmenufeed DCC). NOTE: this source has no per-item nutrition, so calories/protein/carbs/fat are 0 pending NetNutrition or estimates.",
+  "date": "2026-11-13",
+  "source": "dash.swarthmore.edu graphql cbordnetmenufeed (DCC)",
+  "items": [
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Greek Yogurt",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Cottage Cheese",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Milk"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Vanilla Yogurt",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Milk"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Assorted Fruits",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Fruit Salad",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Grapefruit",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Sliced Melon",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Field of Greens",
+      "name": "Hard Boiled Eggs",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Egg"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Free Zone",
+      "name": "Homesfries FreeZone",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Free Zone",
+      "name": "Chicken Sausage",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Free Zone",
+      "name": "Bacon",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Pork"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Phoenix Sandwich",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Scrambled Eggs",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Egg"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Eggs to Order",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Egg"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Breakfast Bread",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Bacon",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Pork"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Chicken Sausage",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Vegan Sausage",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "World of Flavor",
+      "name": "Hashbrowns",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Classics",
+      "name": "Oatmeal",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Classics",
+      "name": "Brown Sugar",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Classics",
+      "name": "Cinnamon Sugar",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Classics",
+      "name": "Craisins",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Classics",
+      "name": "Raisins",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "breakfast",
+      "station": "Classics",
+      "name": "Toasted Almonds",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Tree Nut"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Daily Kneads",
+      "name": "Assorted Donuts",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Daily Kneads",
+      "name": "Assorted Pastries",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "breakfast",
+      "station": "Daily Kneads",
+      "name": "Banana Bread",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Fired Up",
+      "name": "Cheese Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Fired Up",
+      "name": "Pepperoni Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Pork",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Fired Up",
+      "name": "Everything Deep Dish",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Fired Up",
+      "name": "Hot And Sour Soup",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Sesame",
+        "Soy"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "General Tso's Chicken-FZ",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Kosher"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Kidney Beans",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Jasmine Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Mandarin Oranges",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Avocado",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Cucumbers",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Shaved Red Cabbage",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Roasted Broccoli",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Free Zone",
+      "name": "Mixed Greens",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Teriyaki Salmon Bowls",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Teriyaki  Salmon",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Halal"
+      ],
+      "allergens": [
+        "Fish",
+        "Sesame",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Red Quinoa",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "White Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Jasmine Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Crispy Shallots",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Crispy Wonton Strip",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Mandarin Oranges",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Sesame Seeds",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Sesame"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Shaved Red Cabbage",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Steamed Edamame",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Cucumbers",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Avocado",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "World of Flavor",
+      "name": "Red Chili Flakes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Roast Beef Sandwich Bar",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Hoagie Rolls",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Shaved Beef w/ au jus",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Sautéed Mushrooms",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Sautéed Spinach",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Provolone Cheese Sauce",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Caramelized Onions",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Horseradish",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Classics",
+      "name": "Pickled Hot Peppers",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Daily Kneads",
+      "name": "Chocolate Caramel Cupcakes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Daily Kneads",
+      "name": "Funfetti Whoopie Pies",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Daily Kneads",
+      "name": "Raspberry Oat Bars",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Daily Kneads",
+      "name": "Oreo Cheesecake Bars",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Verdant & Vegan",
+      "name": "Green Lentil Dahl",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Verdant & Vegan",
+      "name": "Basmati Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Verdant & Vegan",
+      "name": "Garlic Naan",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Verdant & Vegan",
+      "name": "White Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Verdant & Vegan",
+      "name": "Mango Chutney",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Verdant & Vegan",
+      "name": "Vegan Chocolate Cupcakes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Spice",
+      "name": "Greek Spiced Chicken",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Spice",
+      "name": "Moroccan Couscous & Chickpeas",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Spice",
+      "name": "Roasted Broccoli",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Grillin' Out",
+      "name": "Buffalo Chicken Quesadilla",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Grillin' Out",
+      "name": "Cheese Quesadilla",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Grillin' Out",
+      "name": "Chicken Tenders",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Grillin' Out",
+      "name": "Eggs to Order",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Egg"
+      ]
+    },
+    {
+      "meal": "lunch",
+      "station": "Grillin' Out",
+      "name": "French Fries",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "lunch",
+      "station": "Grillin' Out",
+      "name": "Grilled Chicken Breast",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "Grillin' Out",
+      "name": "French Fries",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "Grillin' Out",
+      "name": "Chicken Tenders",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "snack",
+      "station": "Grillin' Out",
+      "name": "Grilled Chicken Breast",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "Fired Up",
+      "name": "Chefs Choice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "Fired Up",
+      "name": "Cheese Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "snack",
+      "station": "Fired Up",
+      "name": "Pepperoni Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Pork",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "snack",
+      "station": "Daily Kneads",
+      "name": "Chefs Choice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "Free Zone",
+      "name": "Chefs Choice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "World of Flavor",
+      "name": "Chefs Choice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": "Classics",
+      "name": "Chefs Choice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "snack",
+      "station": null,
+      "name": "Cheese Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "snack",
+      "station": null,
+      "name": "Pepperoni Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Pork",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "snack",
+      "station": null,
+      "name": "Romaine Lettuce",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Fired Up",
+      "name": "Cheese Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Fired Up",
+      "name": "Pepperoni Pizza",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Pork",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Fired Up",
+      "name": "Everything Deep Dish",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Fired Up",
+      "name": "Chicken Alfredo Soup",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Halal"
+      ],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Fired Up",
+      "name": "Hot And Sour Soup",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Sesame",
+        "Soy"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Field of Greens",
+      "name": "Broccoli Salad",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Pork"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Free Zone",
+      "name": "Herb Roasted Chicken",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal",
+        "Kosher"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Free Zone",
+      "name": "Mushroom Chicken Gravy FZ",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Free Zone",
+      "name": "Roasted Mini Potatoes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Free Zone",
+      "name": "Steamed Broccoli",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Free Zone",
+      "name": "Mixed Greens",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Dim Sum",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Baked Thai Curry Chicken Potstickers",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Fish",
+        "Shellfish",
+        "Soy",
+        "Tree Nut",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Roast Pork Buns",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Pork",
+        "Sesame",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Beef & Vegetable Dumpling",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Sesame",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Edamame Dumplings",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Chili Garlic Oil",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Ponzu Sauce",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Sesame",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Soy Sauce",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Thai Chili Sauce",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "White Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "World of Flavor",
+      "name": "Oreo Cheesecake Bars",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Classics",
+      "name": "Herb Roasted Chicken",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal",
+        "Kosher"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Classics",
+      "name": "Roasted Garlic Mashed Potatoes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Classics",
+      "name": "Cauliflower Au Gratin",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Classics",
+      "name": "Roasted Green Beans",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Daily Kneads",
+      "name": "Chocolate Caramel Cupcakes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Daily Kneads",
+      "name": "Funfetti Whoopie Pies",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Daily Kneads",
+      "name": "Raspberry Oat Bars",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Daily Kneads",
+      "name": "Ice Cream Bar",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Pad Thai",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Peanut",
+        "Soy"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Roasted Tofu",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Vegan Pad Thai",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Peanut",
+        "Soy"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Bean Sprouts",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Chopped Peanuts",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": [
+        "Peanut"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Chopped Scallion",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Limes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Mint",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Thai Basil",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "White Rice",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Verdant & Vegan",
+      "name": "Vegan Chocolate Cupcakes",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegan"
+      ],
+      "allergens": [
+        "Soy",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Grillin' Out",
+      "name": "Buffalo Chicken Quesadilla",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Grillin' Out",
+      "name": "Chicken Tenders",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [],
+      "allergens": [
+        "Egg",
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Grillin' Out",
+      "name": "Cheese Quesadilla",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Vegetarian"
+      ],
+      "allergens": [
+        "Milk",
+        "Wheat"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Grillin' Out",
+      "name": "Eggs to Order",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free"
+      ],
+      "allergens": [
+        "Egg"
+      ]
+    },
+    {
+      "meal": "dinner",
+      "station": "Grillin' Out",
+      "name": "French Fries",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Vegan"
+      ],
+      "allergens": []
+    },
+    {
+      "meal": "dinner",
+      "station": "Grillin' Out",
+      "name": "Grilled Chicken Breast",
+      "calories": 0,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 0,
+      "dietary": [
+        "Gluten Free",
+        "Halal"
+      ],
+      "allergens": []
+    }
+  ]
+}

@@ -1,5 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Hackro data model (SQLite). See CLAUDE.md "Architecture" + "MVP".
+// SQLite has no enums or arrays: enum-like fields are strings, and
+// lists (dietary labels, allergens, restrictions) are JSON strings.
 
 generator client {
   provider = "prisma-client"
@@ -9,4 +10,76 @@ generator client {
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+/// A student. Onboarding inputs live here; macro targets are computed
+/// from these by src/lib/macros.ts (not stored), so the formula stays
+/// transparent and editable.
+model Profile {
+  id            String   @id @default(cuid())
+  name          String
+  goal          String // "build" | "maintain" | "cut" | "perform"
+  heightCm      Float
+  weightKg      Float
+  age           Int
+  sex           String // "male" | "female"
+  activityLevel String // "sedentary" | "light" | "moderate" | "active" | "veryActive"
+  restrictions  String   @default("[]") // JSON string[] e.g. ["vegan","peanut"]
+  createdAt     DateTime @default(now())
+
+  logs      LogEntry[]
+  whoopDays WhoopDay[]
+}
+
+/// One menu item for one meal on one day, with per-serving nutrition.
+/// Populated by scripts/scrape.ts (live) or scripts/seed.ts (snapshot).
+model MenuItem {
+  id          String  @id @default(cuid())
+  date        String // "YYYY-MM-DD" (local Swarthmore day)
+  meal        String // "breakfast" | "lunch" | "dinner"
+  station     String? // e.g. "Grill", "Vegan Station"
+  name        String
+  servingSize String?
+  calories    Float
+  protein     Float
+  carbs       Float
+  fat         Float
+  dietary     String  @default("[]") // JSON string[] e.g. ["Vegan","Gluten Free"]
+  allergens   String  @default("[]") // JSON string[] e.g. ["Milk","Soy"]
+
+  logs LogEntry[]
+
+  @@unique([date, meal, name])
+  @@index([date, meal])
+}
+
+/// "I ate this": one logged item+servings for a profile.
+model LogEntry {
+  id         String   @id @default(cuid())
+  profileId  String
+  menuItemId String
+  date       String // "YYYY-MM-DD"
+  meal       String // "breakfast" | "lunch" | "dinner"
+  servings   Float    @default(1)
+  createdAt  DateTime @default(now())
+
+  profile  Profile  @relation(fields: [profileId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([profileId, date])
+}
+
+/// Whoop recovery/strain for one profile on one day. `mock` flags
+/// demo/seeded data so the pitch never depends on a live OAuth token.
+model WhoopDay {
+  id        String  @id @default(cuid())
+  profileId String
+  date      String // "YYYY-MM-DD"
+  recovery  Int // 0-100 (%)
+  strain    Float // 0-21 (Whoop day strain)
+  mock      Boolean @default(true)
+
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  @@unique([profileId, date])
 }

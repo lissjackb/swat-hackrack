@@ -27,7 +27,7 @@ Students walk into the dining hall without knowing what to eat, grab something a
 
 ## MVP: must work end-to-end by Sat 1:00pm
 1. **Profile → targets.** Short onboarding (goal: build / maintain / cut / perform; height, weight, age, sex, activity level; dietary restrictions) → daily and per-meal calorie, protein, carb and fat targets. Standard formula (Mifflin-St Jeor × activity factor, protein in g/kg), shown transparently.
-2. **Today's Swarthmore Dining Center menu, with per-item nutrition**, loaded into SQLite. `menu-snapshot.json` is the fallback whenever the live source fails.
+2. **Today's Swarthmore Dining Center menu, with per-item nutrition**, loaded into SQLite. `data/menu-snapshot.json` is the fallback whenever the live source fails.
 3. **Recommended plate.** The LP solver picks items and servings from the current meal that get closest to the meal's macro target, honoring restrictions (vegan, vegetarian, allergens). The Claude API writes a 1–2 sentence "why this plate" note.
 4. **"I ate this" logging → progress.** Daily progress bars against targets, plus a week view.
 5. **Whoop (thin slice).** Pull today's recovery and strain for ONE connected account and adjust that day's targets (e.g. more carbs after high strain, recovery-focused plate when recovery is red). Ship a **mock toggle** so the demo never depends on a live OAuth token.
@@ -50,7 +50,7 @@ Students walk into the dining hall without knowing what to eat, grab something a
 - The page links to **CBORD NetNutrition** (`netnutrition.cbord.com/nn-prod/swarthmore`). That's probably where per-item calories and macros live, which would mean we don't need a separate nutrition lookup.
 - The page uses dietary/allergen labels (Vegan, Vegetarian, Gluten Free, Halal, Kosher, Milk, Egg, Peanut, Tree Nut, Soy, Sesame, Shellfish, Fish, Wheat, Pork, Alcohol, and others). Use them for the restriction filters.
 - Haverford and Bryn Mawr publish nutrition through their own web menu system. Out of scope unless we reach stretch.
-- If live scraping isn't working by **Fri 11:30pm**, freeze on `menu-snapshot.json` (today's real menu, captured by hand) and keep moving. A live scraper is not what wins points.
+- If live scraping isn't working by **Fri 11:30pm**, freeze on `data/menu-snapshot.json` (today's real menu, captured by hand) and keep moving. A live scraper is not what wins points.
 
 ## Whoop notes
 - Whoop's API is **OAuth 2.0, not a plain API key**. It needs a developer app (client ID + secret) and a redirect URI such as `http://localhost:3000/api/whoop/callback`, and the user has to log in and approve scopes.
@@ -58,7 +58,7 @@ Students walk into the dining hall without knowing what to eat, grab something a
 - Keep secrets in `.env.local` (`WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET`, `ANTHROPIC_API_KEY`). **Never commit `.env*`.**
 
 ## Architecture (Liss's diagram)
-Dining site (menu JSON/HTML) → scraper (`tsx` + Cheerio, or a direct JSON fetch) → SQLite via Prisma (`dev.db`) → Next.js API routes (macro targets + LP solver) ↔ React UI (profiles, menu, plates). API routes → Claude API (plate explanations). `menu-snapshot.json` is the demo fallback that feeds the scraper step.
+Dining site (menu JSON/HTML) → scraper (`tsx` + Cheerio, or a direct JSON fetch) → SQLite via Prisma (`dev.db`) → Next.js API routes (macro targets + LP solver) ↔ React UI (profiles, menu, plates). API routes → Claude API (plate explanations). `data/menu-snapshot.json` is the demo fallback that feeds the scraper step.
 
 ## Checkpoints
 - **Fri midnight:** today's menu with nutrition is in the DB (live or snapshot). The `/targets` endpoint returns numbers. The UI skeleton renders the menu.

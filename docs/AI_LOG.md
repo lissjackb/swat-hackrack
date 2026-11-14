@@ -1,0 +1,8 @@
+# AI-use log
+
+One line per meaningful chunk of AI-assisted work (required for the AI-use slide).
+Format: `time | who | tool/model | what it did | how we checked it`
+
+2026-11-13 22:19 | Liss | Claude Code (Opus 4.8) | Scaffolded repo structure to match the architecture: Prisma schema (Profile/MenuItem/LogEntry/WhoopDay), src/lib (macros, solver, claude, db, types), /api route stubs, scrape+seed scripts, menu-snapshot.json, (ui) route group | Ran `prisma db push` + `npm run seed` (11 items + demo profile/history loaded), `npm run typecheck` and `npm run lint` both clean
+2026-11-13 22:34 | Liss | Claude Code (Opus 4.8) | Reverse-engineered the dash.swarthmore.edu menu source (Gatsby page -> GraphQL feed `cbordnetmenufeed` at /graphql, calendarId DCC) and wrote the real scraper: fetches 7 days, parses the HTML description into items/stations and `::label::` dietary+allergen tags, falls back to menu-snapshot.json | Hit the GraphQL endpoint directly and inspected the raw JSON; ran `npm run scrape` live (787 real items loaded, 324 vegan-labeled, 388 w/ allergens) and spot-checked parsed stations/labels against the raw feed; `typecheck`+`lint` clean. Open gap: feed has no macros (nutrition still 0)
+2026-11-13 22:46 | Liss | Claude Code (Opus 4.8) | Renamed lib/routes/snapshot to match the project skills (macros->targets, solver->recommend, api/plate->api/recommend, menu-snapshot.json->data/), patched CLAUDE.md path refs, then ran the demo-check playbook | Re-ran `typecheck`/`lint`/`next build` clean after the renames; demo-check steps 1/3/5/6/7/8 pass, step 4 (solver) FAILs because every menu item has 0 macros (empty plate vs 1367cal/57g-protein target) -> next task is filling nutrition
